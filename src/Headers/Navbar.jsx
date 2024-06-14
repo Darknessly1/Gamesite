@@ -1,4 +1,3 @@
-// import { Fragment } from 'react';
 import {
     Disclosure,
     DisclosureButton,
@@ -12,10 +11,11 @@ import {
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const navigation = [
-    { name: 'Dashboard', href: '#', current: true },
-    { name: 'Team', href: '#', current: false },
-    { name: 'Projects', href: '#', current: false },
-    { name: 'Calendar', href: '#', current: false },
+    { name: 'home', href: '/', current: true },
+    { name: 'Games', href: '#', current: false },
+    { name: 'Suppoert', href: '#', current: false },
+    { name: 'Legends Cards', href: '/showlegendscard', current: false },
+    { name: 'Gwent Cards', href: '/showcards', current: false },
 ];
 
 function classNames(...classes) {

@@ -33,7 +33,7 @@ export default function ShowCards() {
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
-        setCurrentPage(1);  // Reset to first page when search term changes
+        setCurrentPage(1); 
     };
 
     const filteredCards = cards.filter(card =>
@@ -50,7 +50,7 @@ export default function ShowCards() {
     if (error) return <p>Error: {error}</p>;
 
     const handleCardClick = (card) => {
-        navigate(`/cardinfo/${card.id}`, { state: { card } });
+        navigate(`/cardinfo/${card.id}`);
     };
 
     return (
