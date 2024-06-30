@@ -36,9 +36,7 @@ export default function ShowCards() {
         setCurrentPage(1); 
     };
 
-    const filteredCards = cards.filter(card =>
-        card.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    
 
     const indexOfLastCard = currentPage * cardsPerPage;
     const indexOfFirstCard = indexOfLastCard - cardsPerPage;
