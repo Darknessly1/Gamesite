@@ -33,14 +33,12 @@ export default function ShowCards() {
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
-        setCurrentPage(1); 
+        setCurrentPage(1);
     };
-
-    
 
     const indexOfLastCard = currentPage * cardsPerPage;
     const indexOfFirstCard = indexOfLastCard - cardsPerPage;
-    const currentCards = filteredCards.slice(indexOfFirstCard, indexOfFirstCard + cardsPerPage);
+    const currentCards = cards.slice(indexOfFirstCard, indexOfFirstCard + cardsPerPage);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -77,7 +75,7 @@ export default function ShowCards() {
             </div>
             <Pagination
                 cardsPerPage={cardsPerPage}
-                totalCards={filteredCards.length}
+                totalCards={cards.length}
                 paginate={paginate}
                 currentPage={currentPage}
             />

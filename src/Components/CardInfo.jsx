@@ -10,12 +10,13 @@ const CardInfo = () => {
     useEffect(() => {
         async function fetchCardData() {
             try {
-                const response = await fetch(`https://api.gwent.one/?key=data&id=${cardId}&response=json&version=1.1.0`);
+                const response = await fetch(`https://api.gwent.one/?key=data&id=${cardId}&response=json&version=1.1.0`);   
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
-                setCardData(data.response);
+                const card = data.response[cardId];
+                setCardData(card);
             } catch (error) {
                 setError(error.message);
             } finally {
@@ -35,7 +36,7 @@ const CardInfo = () => {
             <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
                 <div className="md:flex">
                     <div className="md:flex-shrink-0">
-                        <img className="h-48 w-full object-cover md:w-48" src={cardData.link_art} alt={cardData.name} />
+                        <img className="h-48 w-full object-cover md:w-48" src={`https://api.gwent.one/${cardData.id.art}`} alt={cardData.name} />
                     </div>
                     <div className="p-8">
                         <div className="uppercase tracking-wide text-sm text-green-600 font-semibold">{cardData.name}</div>
