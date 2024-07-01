@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Pagination from '../Components/Pagination';
+import CardModal from '../Components/CardInfo';
 
 export default function ShowCards() {
     const [cards, setCards] = useState([]);
@@ -8,8 +8,8 @@ export default function ShowCards() {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCard, setSelectedCard] = useState(null);
     const cardsPerPage = 9;
-    const navigate = useNavigate();
 
     useEffect(() => {
         async function fetchCards() {
@@ -36,9 +36,13 @@ export default function ShowCards() {
         setCurrentPage(1);
     };
 
+    const filteredCards = cards.filter(card =>
+        card.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     const indexOfLastCard = currentPage * cardsPerPage;
     const indexOfFirstCard = indexOfLastCard - cardsPerPage;
-    const currentCards = cards.slice(indexOfFirstCard, indexOfFirstCard + cardsPerPage);
+    const currentCards = filteredCards.slice(indexOfFirstCard, indexOfLastCard);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -46,7 +50,11 @@ export default function ShowCards() {
     if (error) return <p>Error: {error}</p>;
 
     const handleCardClick = (card) => {
-        navigate(`/cardinfo/${card.id}`);
+        setSelectedCard(card);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedCard(null);
     };
 
     return (
@@ -62,7 +70,7 @@ export default function ShowCards() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {currentCards.map((card) => (
                     <div
-                        key={card.id}
+                        key={card.id.card}
                         className="block p-4 border rounded-lg shadow-lg bg-white hover:bg-gray-100 cursor-pointer"
                         onClick={() => handleCardClick(card)}
                     >
@@ -75,10 +83,11 @@ export default function ShowCards() {
             </div>
             <Pagination
                 cardsPerPage={cardsPerPage}
-                totalCards={cards.length}
+                totalCards={filteredCards.length}
                 paginate={paginate}
                 currentPage={currentPage}
             />
+            {selectedCard && <CardModal card={selectedCard} onClose={handleCloseModal} />}
         </div>
     );
 }
