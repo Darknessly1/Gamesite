@@ -1,94 +1,43 @@
-// ShowCards.jsx
-import { useEffect, useState } from 'react';
-import Pagination from '../Components/Pagination';
-import CardModal from '../Components/CardModal';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import Card from './components/Card';
+import CardDetails from './components/CardDetails';
 
-export default function ShowLegendsCards() {
+const apiURL = 'https://api.pokemontcg.io/v2/cards';
+const apiKey = 'YOUR_API_KEY_HERE'; // Replace with your actual API key
+
+const ShowLegendsCards = () => {
   const [cards, setCards] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedCard, setSelectedCard] = useState(null);
-  const cardsPerPage = 9;
 
   useEffect(() => {
-    async function fetchCards() {
+    const fetchCards = async () => {
       try {
-        const response = await fetch('https://cors-anywhere.herokuapp.com/https://api.elderscrollslegends.io/v1/cards');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setCards(data.cards);
+        const response = await axios.get(apiURL, {
+          headers: {
+            'X-Api-Key': apiKey,
+          },
+        });
+        setCards(response.data.data);
       } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+        console.error('Error fetching cards:', error);
       }
-    }
+    };
 
     fetchCards();
   }, []);
 
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-    setCurrentPage(1);
-  };
-
-  const filteredCards = cards.filter(card =>
-    card.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const indexOfLastCard = currentPage * cardsPerPage;
-  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
-  const currentCards = filteredCards.slice(indexOfFirstCard, indexOfLastCard);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-
-  const handleCardClick = (card) => {
-    setSelectedCard(card);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedCard(null);
-  };
-
   return (
-    <div className="px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">The Elder Scrolls: Legends Cards</h1>
-      <input
-        type="text"
-        placeholder="Search by card name"
-        value={searchTerm}
-        onChange={handleSearchChange}
-        className="mb-4 p-2 border rounded w-full sm:w-1/2 md:w-1/3"
-      />
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {currentCards.map((card) => (
-          <div
-            key={card.id}
-            className="block p-4 border rounded-lg shadow-lg bg-white hover:bg-gray-100 cursor-pointer"
-            onClick={() => handleCardClick(card)}
-          >
-            <h2 className="text-xl font-semibold mb-2">{card.name}</h2>
-            <p className="text-gray-700">Type: {card.type}</p>
-            <p className="text-gray-700">Cost: {card.cost}</p>
-            <p className="text-gray-700">Power: {card.power}</p>
-            <p className="text-gray-700">Health: {card.health}</p>
-          </div>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-4">Pokémon TCG Cards</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {cards.map((card) => (
+          <Card key={card.id} card={card} onClick={setSelectedCard} />
         ))}
       </div>
-      <Pagination
-        cardsPerPage={cardsPerPage}
-        totalCards={filteredCards.length}
-        paginate={paginate}
-        currentPage={currentPage}
-      />
-      {selectedCard && <CardModal card={selectedCard} onClose={handleCloseModal} />}
+      {selectedCard && <CardDetails card={selectedCard} onClose={() => setSelectedCard(null)} />}
     </div>
   );
-}
+};
+
+export default ShowLegendsCards;
