@@ -11,10 +11,10 @@ import {
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const navigation = [
-    { name: 'home', href: '/', current: true },
+    { name: 'home', href: '/', current: false },
     { name: 'Games', href: '#', current: false },
     { name: 'Suppoert', href: '#', current: false },
-    { name: 'Legends Cards', href: '/showlegendscard', current: false },
+    { name: 'Pokémon Cards', href: '/showlegendscard', current: false },
     { name: 'Gwent Cards', href: '/showcards', current: false },
 ];
 
