@@ -12,7 +12,7 @@ const App = () => {
   const [filteredCards, setFilteredCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const cardsPerPage = 9;
+  const cardsPerPage = 12;
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
