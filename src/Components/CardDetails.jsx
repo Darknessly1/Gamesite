@@ -2,14 +2,19 @@ import React from 'react';
 
 const CardDetails = ({ card, onClose }) => (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex justify-center items-center">
-        <div className="bg-white p-8 rounded-lg max-w-4xl w-full flex">
-            <div className="w-1/2">
-                <img src={card.images.large} alt={card.name} className="w-full h-auto rounded-md" />
+        <div className="bg-white rounded-lg max-w-4xl w-full flex h-4/5">
+            <div className="w-1/2  flex items-center justify-center">
+                <img src={card.images.large} alt={card.name} className="h-5/6 rounded-md  justify-center"  />
             </div>
-            <div className="w-1/2 pl-9 overflow-y-scroll h-96">
-                <button className="mb-4 text-red-600" onClick={onClose}>Close</button>
+            <div className="w-1/2 pl-8 p-4 overflow-y-auto h-full">
+                <button
+                    className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 bg-red-500 text-white shadow-md shadow-gray-900/10 hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none rounded-full"
+                    onClick={onClose}
+                >
+                    Close
+                </button>
                 <h2 className="text-2xl font-bold mt-4">{card.name}</h2>
-                <p className="text-gray-600">{card.supertype} - {card.subtypes?.join(', ') || 'None'}</p>
+                <span className="relative select-none items-center whitespace-nowrap rounded-full bg-green-600 py-1.5 px-3 font-sans text-xs font-bold uppercase text-white">{card.supertype || 'None'}</span> - <span className="relative select-none items-center whitespace-nowrap rounded-full bg-green-600 py-1.5 px-3 font-sans text-xs font-bold uppercase text-white">{card.subtypes?.join(', ') || 'None'}</span>
                 <p className="mt-2"><span className="font-bold">Level: </span>{card.level || 'None'}</p>
                 <p className="mt-2"><span className="font-bold">HP: </span>{card.hp || 'None'}</p>
                 <p className="mt-2"><span className="font-bold">Types: </span>{card.types?.join(', ') || 'None'}</p>

@@ -3,9 +3,10 @@ import axios from 'axios';
 import Card from '../Components/Card';
 import CardDetails from '../Components/CardDetails';
 import Pagination from '../Components/Pagination';
+import CardSearch from '../Components/CardSearch';
 
 const apiURL = 'https://api.pokemontcg.io/v2/cards';
-const apiKey = 'YOUR_API_KEY_HERE'; 
+const apiKey = 'YOUR_API_KEY_HERE';
 
 const App = () => {
   const [cards, setCards] = useState([]);
@@ -50,7 +51,11 @@ const App = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Pokémon TCG Cards</h1>
+      <h1
+        className="text-3xl font-bold mb-4 flex items-center justify-center"
+      >
+        Pokémon TCG Cards
+      </h1>
       <input
         type="text"
         placeholder="Search cards..."
@@ -58,6 +63,8 @@ const App = () => {
         onChange={e => setSearchTerm(e.target.value)}
         className="mb-4 p-2 border border-gray-300 rounded"
       />
+      <CardSearch />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {currentCards.map((card) => (
           <Card key={card.id} card={card} onClick={setSelectedCard} />
