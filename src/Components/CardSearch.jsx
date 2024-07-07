@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import Card from '../Components/Card';
+import CardDetails from '../Components/CardDetails';
+import Pagination from '../Components/Pagination';
 
 const CardSearch = () => {
     const [energyTypes, setEnergyTypes] = useState([]);
@@ -6,9 +9,14 @@ const CardSearch = () => {
     const [selectedType, setSelectedType] = useState('');
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [selectedCard, setSelectedCard] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const cardsPerPage = 12;
+    const [filteredCards, setFilteredCards] = useState([]);
+
+
 
     useEffect(() => {
-        // Fetch all energy types
         fetch('https://api.pokemontcg.io/v2/types')
             .then(response => response.json())
             .then(data => setEnergyTypes(data.data))
@@ -21,6 +29,7 @@ const CardSearch = () => {
             .then(response => response.json())
             .then(data => {
                 setCards(data.data);
+                setFilteredCards(data.data);
                 setLoading(false);
             })
             .catch(error => {
@@ -35,24 +44,29 @@ const CardSearch = () => {
         fetchCardsByType(type);
     };
 
-    const handleNextPage = () => {
-        setPage(prevPage => {
-            const nextPage = prevPage + 1;
-            fetchCardsByType(selectedType, nextPage);
-            return nextPage;
-        });
-    };
+    // const handleNextPage = () => {
+    //     setPage(prevPage => {
+    //         const nextPage = prevPage + 1;
+    //         fetchCardsByType(selectedType, nextPage);
+    //         return nextPage;
+    //     });
+    // };
 
-    const handlePreviousPage = () => {
-        setPage(prevPage => {
-            const prev = Math.max(prevPage - 1, 1);
-            fetchCardsByType(selectedType, prev);
-            return prev;
-        });
-    };
+    // const handlePreviousPage = () => {
+    //     setPage(prevPage => {
+    //         const prev = Math.max(prevPage - 1, 1);
+    //         fetchCardsByType(selectedType, prev);
+    //         return prev;
+    //     });
+    // };
+    const indexOfLastCard = currentPage * cardsPerPage;
+    const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+    const currentCards = filteredCards.slice(indexOfFirstCard, indexOfLastCard);
+
+    const paginate = pageNumber => setCurrentPage(pageNumber);
 
     return (
-        <div className="p-4">
+        <div className="p-4"> 
             <div className="flex flex-wrap gap-4 mb-4">
                 {energyTypes.map((type, index) => (
                     <button
@@ -68,18 +82,14 @@ const CardSearch = () => {
                 <div>Loading...</div>
             ) : (
                 <div>
-                    {cards.length > 0 ? (
+                    {currentCards.length > 0 ? (
                         <div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                {cards.map((card, index) => (
-                                    <div key={index} className="bg-white p-4 rounded-lg shadow-lg">
-                                        <img src={card.images.small} alt={card.name} className="w-full h-auto rounded-md mb-2" />
-                                        <h2 className="text-xl font-bold">{card.name}</h2>
-                                        <p className="text-gray-600">{card.types.join(', ')}</p>
-                                    </div>
+                                {cards.map((card) => (
+                                    <Card key={card.id} card={card} onClick={setSelectedCard} />
                                 ))}
                             </div>
-                            <div className="flex justify-between mt-4">
+                            {/* <div className="flex justify-between mt-4">
                                 {page > 1 && (
                                     <button
                                         className="px-4 py-2 bg-blue-500 text-white rounded-lg"
@@ -94,7 +104,16 @@ const CardSearch = () => {
                                 >
                                     Next
                                 </button>
-                            </div>
+                            </div> */}
+
+                            <Pagination
+                                cardsPerPage={cardsPerPage}
+                                totalCards={filteredCards.length}
+                                paginate={paginate}
+                                currentPage={currentPage}
+                            />
+                            {selectedCard && <CardDetails card={selectedCard} onClose={() => setSelectedCard(null)} />}
+
                         </div>
                     ) : selectedType && (
                         <div>No cards found for {selectedType} type.</div>
