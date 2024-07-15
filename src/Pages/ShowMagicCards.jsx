@@ -1,32 +1,24 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import Card from '../Components/Card';
-import CardDetails from '../Components/CardDetails';
+import CardDetailsMagic from '../Components/CardDetailsMagic';
 import Pagination from '../Components/Pagination';
-import CardSearch from '../Components/CardSearch';
 
-const apiURL = 'https://api.pokemontcg.io/v2/cards';
-const apiKey = 'YOUR_API_KEY_HERE';
+const apiURL = 'https://api.magicthegathering.io/v1/cards';
 
-const App = () => {
+const Magic = () => {
   const [cards, setCards] = useState([]);
   const [filteredCards, setFilteredCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const cardsPerPage = 12;
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState('');
 
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const response = await axios.get(apiURL, {
-          headers: {
-            'X-Api-Key': apiKey,
-          },
-        });
-        setCards(response.data.data);
-        setFilteredCards(response.data.data);
+        const response = await axios.get(apiURL);
+        setCards(response.data.cards);
+        setFilteredCards(response.data.cards);
       } catch (error) {
         console.error('Error fetching cards:', error);
       }
@@ -38,12 +30,11 @@ const App = () => {
   useEffect(() => {
     setFilteredCards(
       cards.filter(card =>
-        card.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (selectedType ? card.types.includes(selectedType) : true)
+        card.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
     setCurrentPage(1);
-  }, [searchTerm, selectedType, cards]);
+  }, [searchTerm, cards]);
 
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
@@ -51,27 +42,28 @@ const App = () => {
 
   const paginate = pageNumber => setCurrentPage(pageNumber);
 
-  const handleTypeClick = (type) => {
-    setSelectedType(type === selectedType ? '' : type);
-  };
-
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4 flex items-center justify-center">
-        Pokémon TCG Cards
+        Magic: The Gathering Arena Cards
       </h1>
       <input
         type="text"
         placeholder="Search cards..."
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
-        className="mb-4 p-2 border border-gray-300 rounded  items-center justify-center"
+        className="mb-4 p-2 border border-gray-300 rounded"
       />
-      <CardSearch handleTypeClick={handleTypeClick} selectedType={selectedType} />
-
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {currentCards.map((card) => (
-          <Card key={card.id} card={card} onClick={setSelectedCard} />
+          <div key={card.id} className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer" onClick={() => setSelectedCard(card)}>
+            <img src={card.imageUrl} alt={card.name} className="w-full h-64 object-contain" />
+            <div className="p-4">
+              <h2 className="text-lg font-bold">{card.name}</h2>
+              <p className="text-gray-700">{card.type}</p>
+              <p className="text-gray-700">{card.set}</p>
+            </div>
+          </div>
         ))}
       </div>
       <Pagination
@@ -80,9 +72,9 @@ const App = () => {
         paginate={paginate}
         currentPage={currentPage}
       />
-      {selectedCard && <CardDetails card={selectedCard} onClose={() => setSelectedCard(null)} />}
+      {selectedCard && <CardDetailsMagic card={selectedCard} onClose={() => setSelectedCard(null)} />}
     </div>
   );
 };
 
-export default App;
+export default Magic;

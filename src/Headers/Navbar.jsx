@@ -14,8 +14,9 @@ const navigation = [
     { name: 'home', href: '/', current: false },
     { name: 'Games', href: '#', current: false },
     { name: 'Suppoert', href: '#', current: false },
-    { name: 'Pokémon Cards', href: '/showlegendscard', current: false },
-    { name: 'Gwent Cards', href: '/showcards', current: false },
+    { name: 'Pokémon Cards', href: '/ShowPokémonCards', current: false },
+    { name: 'Gwent Cards', href: '/ShowGwentCards', current: false },
+    { name: 'Magic: The Gathering Arena', href: '/ShowMagicCards', current: false },
 ];
 
 function classNames(...classes) {
