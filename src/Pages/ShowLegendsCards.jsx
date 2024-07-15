@@ -15,6 +15,7 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const cardsPerPage = 12;
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedType, setSelectedType] = useState('');
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -37,11 +38,12 @@ const App = () => {
   useEffect(() => {
     setFilteredCards(
       cards.filter(card =>
-        card.name.toLowerCase().includes(searchTerm.toLowerCase())
+        card.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (selectedType ? card.types.includes(selectedType) : true)
       )
     );
     setCurrentPage(1);
-  }, [searchTerm, cards]);
+  }, [searchTerm, selectedType, cards]);
 
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
@@ -49,11 +51,13 @@ const App = () => {
 
   const paginate = pageNumber => setCurrentPage(pageNumber);
 
+  const handleTypeClick = (type) => {
+    setSelectedType(type === selectedType ? '' : type);
+  };
+
   return (
     <div className="container mx-auto p-4">
-      <h1
-        className="text-3xl font-bold mb-4 flex items-center justify-center"
-      >
+      <h1 className="text-3xl font-bold mb-4 flex items-center justify-center">
         Pokémon TCG Cards
       </h1>
       <input
@@ -63,7 +67,7 @@ const App = () => {
         onChange={e => setSearchTerm(e.target.value)}
         className="mb-4 p-2 border border-gray-300 rounded"
       />
-      <CardSearch />
+      <CardSearch handleTypeClick={handleTypeClick} selectedType={selectedType} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {currentCards.map((card) => (
