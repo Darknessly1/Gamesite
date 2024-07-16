@@ -39,14 +39,22 @@ const CardModal = ({ card, onClose }) => {
                 </div>
 
                 <div className="flex border-t border-gray-200 h-full">
-                    <div className="w-1/2 bg-gray-50 p-4 flex items-center justify-center">
+                    <div className="w-1/2 flex items-center justify-center relative">
                         {imageUrl ? (
-                            <img src={imageUrl} alt={card.name} className="max-h-full max-w-full" />
+                            <div className="relative">
+                                <img src={imageUrl} alt={card.name} className="object-cover rounded-md max-h-96" />
+                                <img src="https://gwent.one/image/gwent/assets/card/other/medium/border_gold.png" alt="Border" className="absolute inset-0 w-full h-full object-cover" />
+                                <img src="https://gwent.one/image/gwent/assets/card/banner/medium/provision_icon.png" alt="Provision Icon" className=" absolute top-2 right-2 w-full h-full" />
+                                <img src="https://gwent.one/image/gwent/assets/card/banner/medium/provision_neutral.png" alt="Provision Banner" className="absolute top-2 left-2 w-full h-full" />
+                                <img src="https://gwent.one/image/gwent/assets/card/number/medium/provision_8.png" alt="Provision Number" className="absolute top-2 left-12 w-full h-full" />
+                                <img src="https://gwent.one/image/gwent/assets/card/banner/medium/default_neutral.png" alt="Default Banner" className="absolute bottom-2 left-2 w-full h-full" />
+                                <img src="https://gwent.one/image/gwent/assets/card/number/medium/power_4.png" alt="Power Number" className="absolute bottom-2 left-12 w-full h-full" />
+                                <img src="https://gwent.one/image/gwent/assets/card/other/medium/rarity_legendary.png" alt="Rarity Icon" className="absolute top-2 left-20 w-full h-full" />
+                            </div>
                         ) : (
                             <p>No image available</p>
                         )}
                     </div>
-
 
                     <div className="w-1/2 overflow-y-auto">
                         <dl>
