@@ -65,7 +65,7 @@ const App = () => {
         placeholder="Search cards..."
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
-        className="mb-4 p-2 border border-gray-300 rounded  items-center justify-center"
+        className="mb-4 p-2 border border-gray-300 rounded flex items-center justify-center"
       />
       <CardSearch handleTypeClick={handleTypeClick} selectedType={selectedType} />
 
