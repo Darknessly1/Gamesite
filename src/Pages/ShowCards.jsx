@@ -71,13 +71,13 @@ export default function ShowCards() {
                 {currentCards.map((card) => (
                     <div
                         key={card.id.card}
-                        className="block p-4 border rounded-lg shadow-lg bg-white hover:bg-gray-100 cursor-pointer"
+                        className="mr-5 p-4 border rounded-lg shadow-lg bg-white hover:bg-gray-100 cursor-pointer  "
                         onClick={() => handleCardClick(card)}
                     >
-                        <h2 className="text-xl font-semibold mb-2">{card.name}</h2>
-                        <p className="text-gray-700">Category: {card.category}</p>
-                        <p className="text-gray-700">Ability: {card.ability}</p>
-                        <p className="text-gray-700">Flavor: {card.flavor}</p>
+                        <h2 className="text-xl font-semibold mb-2 flex items-center justify-center">{card.name}</h2>
+                        <p className="text-gray-700"><strong className='text-black'>Category</strong>: {card.category}</p>
+                        <p className="text-gray-700"><strong className='text-black'>Ability</strong>: {card.ability}</p>
+                        <p className="text-gray-700"><strong className='text-black'>Flavor</strong>: {card.flavor}</p>
                     </div>
                 ))}
             </div>

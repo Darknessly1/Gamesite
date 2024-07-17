@@ -3,8 +3,6 @@ import { useEffect, useState } from 'react';
 
 const CardModal = ({ card, onClose }) => {
 
-    // if (!card) return null;
-
     const [imageUrl, setImageUrl] = useState('');
     const [borderImageUrl, setBorderImageUrl] = useState('');
     const [provisionIconUrl, setProvisionIconUrl] = useState('');
@@ -31,16 +29,20 @@ const CardModal = ({ card, onClose }) => {
                             setImageUrl(src);
                         } else if (src.includes('border_gold')) {
                             setBorderImageUrl(src);
+                        } else if (src.includes('border_silver')) {
+                            setBorderImageUrl(src);
+                        } else if (src.includes('border_bronze')) {
+                            setBorderImageUrl(src);
                         } else if (src.includes('provision_icon')) {
                             setProvisionIconUrl(src);
-                        } else if (src.includes('provision_neutral')) {
-                            setProvisionFactionUrl(src);
-                        } else if (src.includes('provision_')) {
+                        } else if (src.match(/provision_\d+/)) {
                             setProvisionNumberUrl(src);
-                        } else if (src.includes('rarity_legendary')) {
+                        } else if (src.includes('rarity_')) {
                             setRarityIconUrl(src);
-                        } else if (src.includes('power_')) { // This should match the power image URL
+                        } else if (src.includes('power_') || src.includes('attack_') || src.includes('strength_')) {
                             setPowerImageUrl(src);
+                        } else if (src.includes('provision_')) {
+                            setProvisionFactionUrl(src);
                         }
                     });
                 }
@@ -54,6 +56,7 @@ const CardModal = ({ card, onClose }) => {
         }
     }, [card.id.art]);
 
+
     return (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
             <div className="  bg-white max-w-4xl shadow sm:rounded-lg h-full max-h-screen">
@@ -65,14 +68,14 @@ const CardModal = ({ card, onClose }) => {
                 </div>
 
                 <div className="flex border-t border-gray-200 h-full">
-
                     <div className="md:flex-1 flex flex-col items-center justify-center">
+                        <span className="mb-5 text-3xl font-bold">{card.name}</span>
                         <div className="relative">
                             {imageUrl && (
-                                <img className="h-full w-full  mb-16" src={imageUrl} alt={card.name} />
+                                <img className="h-full w-full mb-16 mr-7" src={imageUrl} alt={card.name} />
                             )}
                             {borderImageUrl && (
-                                <img className="absolute inset-0 w-full h-full mb-16 " src={borderImageUrl} alt="Border" />
+                                <img className="absolute inset-0 w-full h-full mb-16" src={borderImageUrl} alt="Border" />
                             )}
                             {provisionIconUrl && (
                                 <img className="absolute top-0 left-0 w-full h-full mb-16" src={provisionIconUrl} alt="Provision Icon" />
@@ -80,16 +83,16 @@ const CardModal = ({ card, onClose }) => {
                             {provisionFactionUrl && (
                                 <img className="absolute top-0 left-0 w-full h-full mb-16" src={provisionFactionUrl} alt="Provision Faction" />
                             )}
-                            <img src="https://gwent.one/image/gwent/assets/card/banner/medium/default_neutral.png" alt="Default Banner" className="absolute bottom-1 w-full h-full " />
+
+                            <img src="https://gwent.one/image/gwent/assets/card/banner/medium/default_neutral.png" alt="Default Banner" className="absolute bottom-1 w-full h-full" />
                             {provisionNumberUrl && (
                                 <img className="absolute top-0 left-0 w-full h-full mb-16" src={provisionNumberUrl} alt="Provision Number" />
                             )}
                             {rarityIconUrl && (
-                                <img className="absolute bottom-1 left-0 w-full h-full " src={rarityIconUrl} alt="Rarity Icon" />
+                                <img className="absolute bottom-1 left-0 w-full h-full" src={rarityIconUrl} alt="Rarity Icon" />
                             )}
-
                             {powerImageUrl && (
-                                <img className="absolute bottom-1 left-0 w-full h-full " src={powerImageUrl} alt="Power" />
+                                <img className="absolute bottom-1 left-0 w-full h-full" src={powerImageUrl} alt="Power" />
                             )}
                         </div>
                     </div>
@@ -97,14 +100,6 @@ const CardModal = ({ card, onClose }) => {
 
                     <div className="w-1/2 overflow-y-auto">
                         <dl>
-                            <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt className="text-sm font-medium text-gray-500">
-                                    Name
-                                </dt>
-                                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    {card.name || 'N/A'}
-                                </dd>
-                            </div>
                             <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                                 <dt className="text-sm font-medium text-gray-500">
                                     Category
