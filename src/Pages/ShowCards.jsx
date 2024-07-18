@@ -59,13 +59,13 @@ export default function ShowCards() {
 
     return (
         <div className="px-4 py-8">
-            <h1 className="text-3xl font-bold mb-6">GWENT: The Witcher Card Game Cards</h1>
+            <h1 className="text-3xl font-bold mb-6 flex items-center justify-center">GWENT: The Witcher Card Game Cards</h1>
             <input
                 type="text"
                 placeholder="Search by card name"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="mb-4 p-2 border rounded"
+                className="mb-4 p-2 border rounded flex items-center justify-center"
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {currentCards.map((card) => (
