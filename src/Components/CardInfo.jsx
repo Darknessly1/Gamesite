@@ -16,6 +16,8 @@ const CardModal = ({ card, onClose }) => {
     const [deathwishImageUrl, setDeathwishImageUrl] = useState('');
     const [zealImageUrl, setZealImageUrl] = useState('');
     const [harmonyImageUrl, setHarmonyImageUrl] = useState('');
+    const [bannerImageUrl, setBannerImageUrl] = useState('');
+
 
     useEffect(() => {
         const fetchImageUrls = async () => {
@@ -60,23 +62,21 @@ const CardModal = ({ card, onClose }) => {
                         }
                     });
 
-                    // Update provision faction image dynamically based on faction
-                    // const factionRegex = /provision_(.+)\.png/;
-                    // const match = provisionFactionUrl.match(factionRegex);
-                    // if (match && match.length > 1) {
-                    //     const factionName = match[1].replace('_', ' ');
-                    //     const factionImageMap = {
-                    //         monsters: 'default_monsters.png',
-                    //         nilfgaard: 'default_nilfgaard.png',
-                    //         'northern realms': 'default_northern_realms.png',
-                    //         scoiatael: 'default_scoiatael.png',
-                    //         skellige: 'default_skellige.png',
-                    //         syndicate: 'default_syndicate.png',
-                    //         neutral: 'default_neutral.png'
-                    //     };
-                    //     const updatedUrl = `https://gwent.one/image/gwent/assets/card/banner/medium/default_${factionName.toLowerCase()}.png`;
-                    //     setProvisionFactionUrl(updatedUrl);
-                    // }
+                    // Update banner image dynamically based on faction
+                    const faction = card.attributes.faction.toLowerCase().replace(' ', '_');
+                    const factionImageMap = {
+                        monsters: 'default_monsters.png',
+                        nilfgaard: 'default_nilfgaard.png',
+                        northern_realms: 'default_northern_realms.png',
+                        scoiatael: 'default_scoiatael.png',
+                        skellige: 'default_skellige.png',
+                        syndicate: 'default_syndicate.png',
+                        neutral: 'default_neutral.png'
+                    };
+                    if (faction in factionImageMap) {
+                        const updatedBannerUrl = `https://gwent.one/image/gwent/assets/card/banner/medium/${factionImageMap[faction]}`;
+                        setBannerImageUrl(updatedBannerUrl);
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching image:', error);
@@ -86,7 +86,8 @@ const CardModal = ({ card, onClose }) => {
         if (card.id.art) {
             fetchImageUrls();
         }
-    }, [card.id.art]);
+    }, [card.id.art, card.attributes.faction]);
+
 
 
 
@@ -107,78 +108,71 @@ const CardModal = ({ card, onClose }) => {
                 <div className="flex border-t border-gray-200 h-full ">
 
                     <div className="relative mx-auto mt-16">
-                        {/* Main card image */}
+                        <span className='flex m-4 mb-8 mt-0 font-bold text-3xl items-center justify-center'>
+                            {card.name}
+                        </span>
+
                         {imageUrl && (
-                            <img className="w-64 h-auto mx-auto mb-0" src={imageUrl} alt={card.name} />
+                            <img className="w-64 h-auto mx-auto mb-0 " src={imageUrl} alt={card.name} />
                         )}
 
-                        {/* Border image */}
                         {borderImageUrl && (
-                            <img className="absolute inset-0 w-full h-fit" src={borderImageUrl} alt="Border" />
+                            <img className="absolute inset-0 top-12 mt-5 w-full h-fit" src={borderImageUrl} alt="Border" />
                         )}
 
-                        {/* Provision Icon */}
                         {provisionIconUrl && (
-                            <img className="absolute top-2 left-2 w-fit h-fit inset-0" src={provisionIconUrl} alt="Provision Icon" />
+                            <img className="absolute top-12 mt-7 left-2 w-fit h-fit inset-0" src={provisionIconUrl} alt="Provision Icon" />
                         )}
 
-                        {/* Provision Faction */}
                         {provisionFactionUrl && (
-                            <img className="absolute top-2 left-2 w-fit h-fit inset-0" src={provisionFactionUrl} alt="Provision Faction" />
+                            <img className="absolute top-12 mt-7 left-2 w-fit h-fit inset-0" src={provisionFactionUrl} alt="Provision Faction" />
                         )}
-
-                        {/* Default Banner */}
-                        <img
-                            src="https://gwent.one/image/gwent/assets/card/banner/medium/default_neutral.png"
-                            alt="Default Banner"
-                            className="absolute top-0 w-full inset-0"
-                        />
-
-                        {/* Provision Number */}
+                        
                         {provisionNumberUrl && (
-                            <img className="absolute top-3 left-2 w-fit h-fit inset-0" src={provisionNumberUrl} alt="Provision Number" />
+                            <img className="absolute top-12 mt-7 left-2 w-fit h-fit inset-0" src={provisionNumberUrl} alt="Provision Number" />
                         )}
 
-                        {/* Rarity Icon */}
+                        {bannerImageUrl && (
+                            <img
+                                src={bannerImageUrl}
+                                alt="Default Banner"
+                                className="absolute top-12 mt-4 w-full inset-0"
+                            />
+                        )}
+
+
                         {rarityIconUrl && (
-                            <img className="absolute top-0 left-0 w-fit h-fit inset-0" src={rarityIconUrl} alt="Rarity Icon" />
+                            <img className="absolute top-12 mt-4 left-0 w-fit h-fit inset-0" src={rarityIconUrl} alt="Rarity Icon" />
                         )}
 
-                        {/* Power Image */}
                         {powerImageUrl && (
-                            <img className="absolute bottom-0 left-0 w-fit h-fit inset-0" src={powerImageUrl} alt="Power" />
+                            <img className="absolute bottom-0 top-12 mt-4 left-0 w-fit h-fit inset-0" src={powerImageUrl} alt="Power" />
                         )}
 
-                        {/* Trinket Image */}
                         {trinketImageUrl && (
-                            <img className="absolute bottom-0 left-0 w-16 h-16" src={trinketImageUrl} alt="Trinket" />
+                            <img className="absolute bottom-0 top-12 mt-4  left-0 w-fit h-fit inset-0" src={trinketImageUrl} alt="Trinket" />
                         )}
 
-                        {/* Order Image */}
                         {orderImageUrl && (
-                            <img className="absolute bottom-0 left-0 w-16 h-16" src={orderImageUrl} alt="Order" />
+                            <img className="absolute bottom-0 top-12 mt-4  left-0 w-fit h-fit inset-0" src={orderImageUrl} alt="Order" />
                         )}
 
-                        {/* Deploy Image */}
                         {deployImageUrl && (
-                            <img className="absolute bottom-0 left-0 w-16 h-16" src={deployImageUrl} alt="Deploy" />
+                            <img className="absolute bottom-0 top-12 mt-4  left-0 w-fit h-fit inset-0" src={deployImageUrl} alt="Deploy" />
                         )}
 
-                        {/* Deathwish Image */}
                         {deathwishImageUrl && (
-                            <img className="absolute bottom-0 left-0 w-16 h-16" src={deathwishImageUrl} alt="Deathwish" />
+                            <img className="absolute bottom-0 top-12 mt-4  left-0 w-fit h-fit inset-0" src={deathwishImageUrl} alt="Deathwish" />
                         )}
 
-                        {/* Zeal Image */}
                         {zealImageUrl && (
-                            <img className="absolute bottom-0 left-0 w-16 h-16" src={zealImageUrl} alt="Zeal" />
+                            <img className="absolute bottom-0 top-12 mt-4  left-0 w-fit h-fit inset-0" src={zealImageUrl} alt="Zeal" />
                         )}
 
-                        {/* Harmony Image */}
                         {harmonyImageUrl && (
-                            <img className="absolute bottom-0 left-0 w-16 h-16" src={harmonyImageUrl} alt="Harmony" />
+                            <img className="absolute bottom-0 top-12 mt-4  left-0 w-fit h-fit inset-0" src={harmonyImageUrl} alt="Harmony" />
                         )}
-                    </div>  
+                    </div>
 
 
                     <div className="w-1/2 overflow-y-auto">
