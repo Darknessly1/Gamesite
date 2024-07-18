@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, Link } from "react-router-dom";
+import { Carousel } from 'react-responsive-carousel';
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carousel styles
 
 const GameDetails = () => {
     const { id } = useParams();
@@ -13,8 +15,9 @@ const GameDetails = () => {
         dateTime: null,
     });
     const [showUserReview, setShowUserReview] = useState(false);
-    const [currentIndex, setCurrentIndex] = useState(0);
     const [images, setImages] = useState([]);
+    const [showFullDescription, setShowFullDescription] = useState(false);
+    const [showAllTags, setShowAllTags] = useState(false);
 
     useEffect(() => {
         const fetchGameDetails = async () => {
@@ -23,7 +26,11 @@ const GameDetails = () => {
                     `https://api.rawg.io/api/games/${id}?key=88de0b77186a41b7960ab1e61efd24da`
                 );
                 setGameDetails(response.data);
-                setImages(response.data.short_screenshots.map(screenshot => screenshot.image));
+                if (response.data.short_screenshots) {
+                    setImages(response.data.short_screenshots.map(screenshot => screenshot.image));
+                } else {
+                    setImages([]);
+                }
             } catch (error) {
                 console.error("Error fetching game details:", error);
             } finally {
@@ -48,12 +55,12 @@ const GameDetails = () => {
         setShowUserReview(true);
     };
 
-    const previousImage = () => {
-        setCurrentIndex(currentIndex > 0 ? currentIndex - 1 : images.length - 1);
+    const toggleDescription = () => {
+        setShowFullDescription(!showFullDescription);
     };
 
-    const nextImage = () => {
-        setCurrentIndex(currentIndex < images.length - 1 ? currentIndex + 1 : 0);
+    const toggleTags = () => {
+        setShowAllTags(!showAllTags);
     };
 
     if (loading) {
@@ -70,18 +77,26 @@ const GameDetails = () => {
                 <h1 className="text-3xl font-bold text-center mb-6">{gameDetails.name}</h1>
                 <div className="flex flex-col md:flex-row">
                     <div className="md:w-1/2 mb-4 md:mb-0">
-                        <img
-                            className="w-full rounded-lg"
-                            src={gameDetails.background_image}
-                            alt={gameDetails.name}
-                        />
+                        <img className="w-full rounded-lg" src={gameDetails.background_image} alt={gameDetails.name} />
                         <div className="mt-4">
                             <p><strong>Platforms:</strong> {gameDetails.platforms && gameDetails.platforms.length > 0 ? gameDetails.platforms.map(platform => (
                                 <Link key={platform.platform.id} to={`/store/${platform.platform.slug}`} className="inline-block bg-gray-200 text-gray-700 rounded px-3 py-1 text-sm mr-2 mb-2">{platform.platform.name}</Link>
                             )) : "N/A"}</p>
-                            <p><strong>Tags:</strong> {gameDetails.tags && gameDetails.tags.length > 0 ? gameDetails.tags.map(tag => (
-                                <span key={tag.id} className="inline-block bg-gray-300 text-gray-700 rounded px-3 py-1 text-sm mr-2 mb-2">{tag.name}</span>
-                            )) : "N/A"}</p>
+                            <p><strong>Tags:</strong> {gameDetails.tags && gameDetails.tags.length > 0 ? (
+                                <>
+                                    {showAllTags ? gameDetails.tags.map(tag => (
+                                        <span key={tag.id} className="inline-block bg-gray-300 text-gray-700 rounded px-3 py-1 text-sm mr-2 mb-2">{tag.name}</span>
+                                    )) : gameDetails.tags.slice(0, 5).map(tag => (
+                                        <span key={tag.id} className="inline-block bg-gray-300 text-gray-700 rounded px-3 py-1 text-sm mr-2 mb-2">{tag.name}</span>
+                                    ))}
+                                    {gameDetails.tags.length > 5 && (
+                                        <button onClick={toggleTags} className="text-blue-500 hover:underline">
+                                            {showAllTags ? "Show Less" : "Show More Tags"}
+                                        </button>
+                                    )}
+                                </>
+                            ) : "N/A"}
+                            </p>
                         </div>
                     </div>
                     <div className="md:w-1/2 md:pl-8">
@@ -108,7 +123,12 @@ const GameDetails = () => {
                         </div>
                         <div className="mb-4">
                             <h3 className="text-xl font-semibold">Description:</h3>
-                            <p className="text-gray-700">{gameDetails.description_raw}</p>
+                            <p className="text-gray-700">
+                                {showFullDescription ? gameDetails.description_raw : `${gameDetails.description_raw.slice(0, 100)}...`}
+                            </p>
+                            <button onClick={toggleDescription} className="text-blue-500 hover:underline">
+                                {showFullDescription ? "Show Less" : "Read More"}
+                            </button>
                         </div>
                         <div className="flex justify-between items-center">
                             <Link to="/" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Back to All Games</Link>
@@ -118,30 +138,22 @@ const GameDetails = () => {
             </div>
             <div className="card border border-gray-200 rounded-lg shadow-lg p-6">
                 <h3 className="text-2xl font-semibold text-center mb-6">Screenshots</h3>
-                <div className="relative mx-auto max-w-2xl overflow-hidden rounded-md bg-gray-100 p-2 sm:p-4">
-                    <div className="absolute right-5 top-5 z-10 rounded-full bg-gray-600 px-2 text-center text-sm text-white">
-                        <span>{currentIndex + 1}</span>/<span>{images.length}</span>
-                    </div>
-
-                    <button onClick={previousImage} className="absolute left-5 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-gray-100 shadow-md">
-                        <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
-                    </button>
-
-                    <button onClick={nextImage} className="absolute right-5 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-gray-100 shadow-md">
-                        <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-                    </button>
-
-                    <div className="relative h-80" style={{ width: "30rem" }}>
+                {images.length > 0 ? (
+                    <Carousel showArrows={true} showThumbs={false} infiniteLoop={true} dynamicHeight={true}>
                         {images.map((image, index) => (
-                            <div key={index} className={currentIndex === index ? "block" : "hidden"}>
+                            <div key={index}>
                                 <img src={image} alt={`Screenshot ${index + 1}`} className="rounded-sm w-full h-full object-cover" />
                             </div>
                         ))}
-                    </div>
-                </div>
+                    </Carousel>
+                ) : (
+                    <p className="text-center text-gray-500">No screenshots available</p>
+                )}
             </div>
         </div>
     );
 };
 
 export default GameDetails;
+
+

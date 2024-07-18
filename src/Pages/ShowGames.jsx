@@ -11,14 +11,17 @@ const GameList = () => {
 
     useEffect(() => {
         const fetchGames = async () => {
-            const apiKey = 'dab6a5830d54480d9de4890ba4020fcd';
-            const url = `https://api.rawg.io/api/games?key=${apiKey}&page=${currentPage}&page_size=${gamesPerPage}`;
+            const url = 'http://localhost:5000/api/games';
+            const body = `fields id,name,cover.url,release_dates.human; limit ${gamesPerPage}; offset ${(currentPage - 1) * gamesPerPage};`;
 
             try {
-                const response = await axios.get(url);
-                setGames(response.data.results);
+                console.log('Sending request to server with body:', body);  // Log request body for debugging
+                const response = await axios.post(url, body);
+                console.log('Received response:', response.data);  // Log response data for debugging
+                setGames(response.data);
                 setLoading(false);
             } catch (error) {
+                console.error('Error fetching games:', error);  // Log the error
                 setError(error);
                 setLoading(false);
             }
@@ -37,12 +40,12 @@ const GameList = () => {
                 {games.map(game => (
                     <div key={game.id} className="bg-white shadow-md rounded-md overflow-hidden">
                         <Link to={`/games/${game.id}`}>
-                            {game.background_image && (
-                                <img src={game.background_image} alt={game.name} className="w-full h-48 object-cover" />
+                            {game.cover && game.cover.url && (
+                                <img src={game.cover.url} alt={game.name} className="w-full h-48 object-cover" />
                             )}
                             <div className="p-4">
                                 <h2 className="text-xl font-semibold">{game.name}</h2>
-                                <p className="text-sm text-gray-500 mt-2">{game.released}</p>
+                                <p className="text-sm text-gray-500 mt-2">{game.release_dates ? game.release_dates[0].human : "N/A"}</p>
                             </div>
                         </Link>
                     </div>
