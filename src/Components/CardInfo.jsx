@@ -61,22 +61,22 @@ const CardModal = ({ card, onClose }) => {
                     });
 
                     // Update provision faction image dynamically based on faction
-                    const factionRegex = /provision_(.+)\.png/;
-                    const match = provisionFactionUrl.match(factionRegex);
-                    if (match && match.length > 1) {
-                        const factionName = match[1].replace('_', ' ');
-                        const factionImageMap = {
-                            monsters: 'default_monsters.png',
-                            nilfgaard: 'default_nilfgaard.png',
-                            'northern realms': 'default_northern_realms.png',
-                            scoiatael: 'default_scoiatael.png',
-                            skellige: 'default_skellige.png',
-                            syndicate: 'default_syndicate.png',
-                            neutral: 'default_neutral.png'
-                        };
-                        const updatedUrl = `https://gwent.one/image/gwent/assets/card/banner/medium/default_${factionName.toLowerCase()}.png`;
-                        setProvisionFactionUrl(updatedUrl);
-                    }
+                    // const factionRegex = /provision_(.+)\.png/;
+                    // const match = provisionFactionUrl.match(factionRegex);
+                    // if (match && match.length > 1) {
+                    //     const factionName = match[1].replace('_', ' ');
+                    //     const factionImageMap = {
+                    //         monsters: 'default_monsters.png',
+                    //         nilfgaard: 'default_nilfgaard.png',
+                    //         'northern realms': 'default_northern_realms.png',
+                    //         scoiatael: 'default_scoiatael.png',
+                    //         skellige: 'default_skellige.png',
+                    //         syndicate: 'default_syndicate.png',
+                    //         neutral: 'default_neutral.png'
+                    //     };
+                    //     const updatedUrl = `https://gwent.one/image/gwent/assets/card/banner/medium/default_${factionName.toLowerCase()}.png`;
+                    //     setProvisionFactionUrl(updatedUrl);
+                    // }
                 }
             } catch (error) {
                 console.error('Error fetching image:', error);
@@ -178,7 +178,7 @@ const CardModal = ({ card, onClose }) => {
                         {harmonyImageUrl && (
                             <img className="absolute bottom-0 left-0 w-16 h-16" src={harmonyImageUrl} alt="Harmony" />
                         )}
-                    </div>
+                    </div>  
 
 
                     <div className="w-1/2 overflow-y-auto">
