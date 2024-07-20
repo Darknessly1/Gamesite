@@ -68,7 +68,7 @@ const GameDetail = () => {
                 ))}
             </div>
 
-            <h2 className="text-xl font-bold mt-4">Movies</h2>
+            <h2 className="text-xl font-bold mt-4">Video</h2>
             {game.movies?.map((movie, index) => (
                 <div key={index} className="mb-4">
                     <h3 className="text-lg">{movie.name}</h3>
