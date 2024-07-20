@@ -64,7 +64,7 @@ const ShowGames = () => {
         if (games.length > 0) {
             fetchGameDetails();
         }
-    }, [currentPage, games, detailedGames]);
+    }, [currentPage, games]);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -72,6 +72,7 @@ const ShowGames = () => {
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
+        setCurrentPage(1); // Reset to first page when search term changes
     };
 
     const filteredGames = games.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));

@@ -15,7 +15,7 @@ const PagesRoutes = () => {
     { path: '/cardinfo/:id', element: <CardInfo /> },
     { path: '/ShowMagicCards', element: <Magic /> },
     { path: '/games', element: <ShowGames /> },
-    { path: '/games/:id', element: <GameDetail /> },
+    { path: '/games/:appid', element: <GameDetail /> },
   ]);
 };
 
