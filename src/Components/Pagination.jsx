@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 
 function Pagination({ cardsPerPage, totalCards, paginate, currentPage }) {
     const pageNumbers = [];
@@ -54,12 +53,4 @@ function Pagination({ cardsPerPage, totalCards, paginate, currentPage }) {
         </nav>
     );
 }
-
-Pagination.propTypes = {
-    cardsPerPage: PropTypes.number.isRequired,
-    totalCards: PropTypes.number.isRequired,
-    paginate: PropTypes.func.isRequired,
-    currentPage: PropTypes.number.isRequired,
-};
-
 export default Pagination;
