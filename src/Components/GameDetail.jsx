@@ -74,12 +74,16 @@ const GameDetail = () => {
                         onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/300x450?text=No+Image'; }}
                     />
                     <div className='flex items-center justify-center m-4'>
-                        <p className="mb-2"><strong>Publisher:</strong> {game.publishers.join(', ')}</p>
-                        <p className="mb-2"><strong>Developer:</strong> {game.developers.join(', ')}</p>
-                        <p className="mb-2"><strong>Genres:</strong> {game.genres.map(genre => genre.description).join(', ')}</p>
-                        <p className="mb-2"><strong>Platforms:</strong> {Object.keys(game.platforms).filter(key => game.platforms[key]).join(', ')}</p>
-                        <p className="mb-2"><strong>Release Date:</strong> {game.release_date.date}</p>
                         <p className="mb-2"><strong>Price:</strong> {game.price_overview ? game.price_overview.final_formatted : 'N/A'}</p>
+                    </div>
+                    <div className='flex items-center justify-center m-4'>
+                        <ul>
+                            <p className="mb-2"><strong>Publisher:</strong> {game.publishers.join(', ')}</p>
+                            <p className="mb-2"><strong>Developer:</strong> {game.developers.join(', ')}</p>
+                            <p className="mb-2"><strong>Genres:</strong> {game.genres.map(genre => genre.description).join(', ')}</p>
+                            <p className="mb-2"><strong>Platforms:</strong> {Object.keys(game.platforms).filter(key => game.platforms[key]).join(', ')}</p>
+                            <p className="mb-2"><strong>Release Date:</strong> {game.release_date.date}</p>
+                        </ul>
                     </div>
 
                     <div>
@@ -105,13 +109,24 @@ const GameDetail = () => {
                             </div>
                         )}
                     </div>
-                    
                 </div>
 
                 <div>
                     <p className="mb-2"><strong>Short Description:</strong> {game.short_description}</p>
                     <p className="mb-2"><strong>About the Game:</strong> <span dangerouslySetInnerHTML={{ __html: sanitizedAboutTheGame }} /></p>
-                    <p className="mb-2"><strong>Supported Languages:</strong> {game.supported_languages}</p>
+                    {game.supported_languages && (
+                        <div className="m-3">
+                            <strong>Supported Languages:</strong>
+                            <p
+                                dangerouslySetInnerHTML={{
+                                    __html: game.supported_languages
+                                        .replace(/<strong>\*<\/strong>/g, '')  // Remove stars
+                                        .replace(/<br><strong>\*<\/strong>languages with full audio support/, '')  // Remove explanatory text
+                                }}
+                            />
+                        </div>
+                    )}
+
                     <p className="mb-2"><strong>Recommendations:</strong> {game.recommendations.total}</p>
                     <p className="mb-2"><strong>Support Info:</strong> <a href={game.support_info.url}>{game.support_info.url}</a></p>
                 </div>
@@ -132,7 +147,7 @@ const GameDetail = () => {
                 </button>
             </div>
 
-            <div className="flex items-center justify-center mt-4 w-fit overflow-x-scroll overflow-y-hidden">
+            <div className="flex items-center justify-center mt-4 overflow-y-hidden overflow-x-auto">
                 {game.screenshots.map((screenshot, index) => (
                     <img
                         key={index}
