@@ -25,7 +25,8 @@
     "react-bootstrap": "^2.10.4",
     "react-dom": "^18.2.0",
     "react-responsive-carousel": "^3.2.23",
-    "react-router-dom": "^6.25.1"
+    "react-router-dom": "^6.25.1",
+    "sanitize-html": "^2.13.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
