@@ -19,7 +19,7 @@ const GameDetail = () => {
             try {
                 console.log(`Fetching details for appid: ${appid}`);
                 const response = await axios.get(`http://localhost:4000/api/games/${appid}`);
-                console.log('API response:', response.data);
+                // console.log('API response:', response.data);
 
                 const gameData = response.data;
                 if (!gameData || !gameData.appid) {
@@ -62,7 +62,7 @@ const GameDetail = () => {
     });
 
     return (
-        <div className="mx-auto p-4 bg-cover bg-fixed text-white" style={{ backgroundImage: `url(${game.background})` }}>
+        <div className="mx-auto p-4 bg-cover bg-fixed text-white" style={{backgroundImage: game.background ?  `url(${game.background})` : 'none', backgroundColor: game.background ? 'transparent' : 'gray'}}>
             <h1 className="text-5xl font-bold mb-8 flex items-center justify-center ">{game.name}</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -77,10 +77,10 @@ const GameDetail = () => {
                         <p className="mb-2"><strong>Price:</strong> {game.price_overview ? game.price_overview.final_formatted : 'N/A'}</p>
                     </div>
                     <div className='flex items-center justify-center m-4'>
-                        <ul>
-                            <p className="mb-2"><strong>Publisher:</strong> {game.publishers.join(', ')}</p>
-                            <p className="mb-2"><strong>Developer:</strong> {game.developers.join(', ')}</p>
-                            <p className="mb-2"><strong>Genres:</strong> {game.genres.map(genre => genre.description).join(', ')}</p>
+                        <ul className='border p-4 rounded-lg'>
+                            <p className="mb-2"><strong>Publisher:</strong> {game.publishers}</p>
+                            <p className="mb-2"><strong>Developer:</strong> {game.developers}</p>
+                            {/* <p className="mb-2"><strong>Genres:</strong> {game && game.genres.map(genre => genre.description).join(', ')}</p> */}
                             <p className="mb-2"><strong>Platforms:</strong> {Object.keys(game.platforms).filter(key => game.platforms[key]).join(', ')}</p>
                             <p className="mb-2"><strong>Release Date:</strong> {game.release_date.date}</p>
                         </ul>
@@ -88,18 +88,23 @@ const GameDetail = () => {
 
                     <div>
 
-                        {game.pc_requirements && (
+                        {game.pc_requirements ? (
                             <div className='m-3'>
                                 <strong><em>PC Requirements:</em></strong>
                                 <div dangerouslySetInnerHTML={{ __html: game.pc_requirements.minimum }}></div>
+                                <div dangerouslySetInnerHTML={{ __html: game.pc_requirements.recommended }}></div>
                             </div>
+                        ) : (
+                            <p>No information about the recommendations</p>
                         )}
 
-                        {game.mac_requirements && (
+                        {game.mac_requirements ? (
                             <div className='m-3'>
                                 <strong><em>Mac Requirements:</em></strong>
                                 <div dangerouslySetInnerHTML={{ __html: game.mac_requirements.minimum }}></div>
                             </div>
+                        ) : (
+                            <p>No information about the recommendations</p>
                         )}
 
                         {game.linux_requirements && (
@@ -109,26 +114,32 @@ const GameDetail = () => {
                             </div>
                         )}
                     </div>
+
+                    <div className=' border-spacing-9 border rounded-lg p-4 m-4 max-w-max'>
+                        <p className="mb-2"><strong>Recommendations:</strong> {game.recommendations ? game.recommendations.total : "nothing"}</p>
+                        <p className="mb-2"><strong>Support Info:</strong> <a href={game.support_info.url} className="inline-block">{game.support_info.url}</a></p>
+                    </div>
+
+                    <div className=' border rounded-lg m-4 '>
+                        {game.supported_languages && (
+                            <div className="m-3">
+                                <strong>Supported Languages:</strong>
+                                <p
+                                    dangerouslySetInnerHTML={{
+                                        __html: game.supported_languages
+                                            .replace(/<strong>\*<\/strong>/g, '')  // Remove stars
+                                            .replace(/<br><strong>\*<\/strong>languages with full audio support/, '')  // Remove explanatory text
+                                    }}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                <div>
-                    <p className="mb-2"><strong>Short Description:</strong> {game.short_description}</p>
-                    <p className="mb-2"><strong>About the Game:</strong> <span dangerouslySetInnerHTML={{ __html: sanitizedAboutTheGame }} /></p>
-                    {game.supported_languages && (
-                        <div className="m-3">
-                            <strong>Supported Languages:</strong>
-                            <p
-                                dangerouslySetInnerHTML={{
-                                    __html: game.supported_languages
-                                        .replace(/<strong>\*<\/strong>/g, '')  // Remove stars
-                                        .replace(/<br><strong>\*<\/strong>languages with full audio support/, '')  // Remove explanatory text
-                                }}
-                            />
-                        </div>
-                    )}
-
-                    <p className="mb-2"><strong>Recommendations:</strong> {game.recommendations.total}</p>
-                    <p className="mb-2"><strong>Support Info:</strong> <a href={game.support_info.url}>{game.support_info.url}</a></p>
+                <div className='p-4 border rounded-lg'>
+                    <h1 className='text-2xl font-bold'>INFORMATION: </h1>
+                    <div className="mb-2 p-2 border rounded-lg"><strong>Short Description:</strong> {game.short_description}</div>
+                    <div className="mb-2 p-2 border rounded-lg"><strong>About the Game:</strong> <span dangerouslySetInnerHTML={{ __html: sanitizedAboutTheGame }} /></div>
                 </div>
 
             </div>
@@ -137,18 +148,24 @@ const GameDetail = () => {
                 <button onClick={prevSlide} className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded">
                     &lt;
                 </button>
-                <img
-                    src={game.screenshots[currentSlide]?.path_full}
-                    alt={`Screenshot ${currentSlide + 1}`}
-                    className="w-full max-h-96 object-contain rounded-md"
-                />
+                {game.screenshots && game.screenshots.length > 0 ? (
+                    <img
+                        src={game.screenshots[currentSlide]?.path_full}
+                        alt={`Screenshot ${currentSlide + 1}`}
+                        className="w-full max-h-96 object-contain rounded-md"
+                    />
+                ) : (
+                    <div className="w-full max-h-96 object-contain rounded-md bg-gray-200 flex items-center justify-center">
+                        No screenshots available
+                    </div>
+                )}
                 <button onClick={nextSlide} className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-gray-800 text-white p-2 rounded">
                     &gt;
                 </button>
             </div>
 
             <div className="flex items-center justify-center mt-4 overflow-y-hidden overflow-x-auto">
-                {game.screenshots.map((screenshot, index) => (
+                {game.screenshots && game.screenshots.map((screenshot, index) => (
                     <img
                         key={index}
                         src={screenshot.path_thumbnail}
@@ -158,6 +175,7 @@ const GameDetail = () => {
                     />
                 ))}
             </div>
+            
         </div>
     );
 };

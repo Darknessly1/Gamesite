@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import Pagination from '../Components/Pagination';
+import debounce from 'lodash.debounce';
 
 const ShowGames = () => {
     const [games, setGames] = useState([]);
@@ -11,14 +12,16 @@ const ShowGames = () => {
     const [error, setError] = useState(null);
 
     const gamesPerPage = 6;
+    const excludedAppIds = [216938, 660010, 660130];
 
     useEffect(() => {
         const fetchGames = async () => {
             try {
                 const response = await axios.get('http://localhost:4000/api/games');
-                console.log('API response:', response.data);
                 if (response.data && response.data.applist && response.data.applist.apps) {
-                    const allGames = response.data.applist.apps.filter(game => game.name); // Filter out games without names
+                    const allGames = response.data.applist.apps.filter(
+                        game => game.name && !excludedAppIds.includes(game.appid)
+                    );
                     setGames(allGames);
                 } else {
                     setError('Invalid data structure received from API');
@@ -35,17 +38,16 @@ const ShowGames = () => {
         const fetchGameDetails = async () => {
             const startIndex = (currentPage - 1) * gamesPerPage;
             const currentGames = games.slice(startIndex, startIndex + gamesPerPage);
+
             const gameDetailsPromises = currentGames.map(async game => {
                 if (!detailedGames[game.appid]) {
                     try {
                         const detailsResponse = await axios.get(`http://localhost:4000/api/games/${game.appid}`);
-                        return { appid: game.appid, ...detailsResponse.data };
+                        const gameData = detailsResponse.data;
+                        return { appid: game.appid, ...gameData };
                     } catch (err) {
                         console.error(`Error fetching game details for appid ${game.appid}:`, err);
-                        setDetailedGames(prev => ({
-                            ...prev,
-                            [game.appid]: { error: 'No information available' },
-                        }));
+                        return { appid: game.appid, error: 'No information available' };
                     }
                 }
                 return null;
@@ -64,7 +66,7 @@ const ShowGames = () => {
         if (games.length > 0) {
             fetchGameDetails();
         }
-    }, [currentPage, games]);
+    }, [currentPage, games, detailedGames]);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -72,8 +74,16 @@ const ShowGames = () => {
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
-        setCurrentPage(1); // Reset to first page when search term changes
+        setCurrentPage(1);
     };
+
+    const debouncedHandleSearch = useCallback(debounce(handleSearch, 300), []);
+
+    useEffect(() => {
+        return () => {
+            debouncedHandleSearch.cancel();
+        };
+    }, [debouncedHandleSearch]);
 
     const filteredGames = games.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -88,34 +98,28 @@ const ShowGames = () => {
                 type="text"
                 placeholder="Search games..."
                 value={searchTerm}
-                onChange={handleSearch}
+                onChange={debouncedHandleSearch}
                 className="mb-4 p-2 border rounded w-full"
             />
             {error && <p className="text-red-500">{error}</p>}
             <div className="grid grid-cols-3 gap-4">
-                {currentGames.map(game => {
-                    const detailedGame = detailedGames[game.appid];
-                    return (
-                        <Link to={`/games/${game.appid}`} key={game.appid} className="bg-white p-4 rounded shadow-md">
-                            <div className="flex flex-col items-center">
-                                {detailedGame && detailedGame.header_image ? (
+                {currentGames.map(game => (
+                    <Link to={`/games/${game.appid}`} key={game.appid} className="bg-white p-4 rounded shadow-md">
+                        <div className="flex flex-col items-center">
+                            {detailedGames[game.appid] && (
+                                <>
                                     <img
-                                        src={detailedGame.header_image}
-                                        alt={game.name}
+                                        src={detailedGames[game.appid].header_image}
                                         className="mb-2"
-                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/300x450?text=No+Image'; }}
                                     />
-                                ) : (
-                                    <div className="mb-2" style={{ width: '300px', height: '450px', backgroundColor: '#ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <span>{detailedGame && detailedGame.error ? detailedGame.error : 'Loading...'}</span>
-                                    </div>
-                                )}
-                                <p className="text-center">{game.name}</p>
-                            </div>
-                        </Link>
-                    );
-                })}
+                                    <p className="text-center">{game.name}</p>
+                                </>
+                            )}
+                        </div>
+                    </Link>
+                ))}
             </div>
+
             <Pagination
                 cardsPerPage={gamesPerPage}
                 totalCards={filteredGames.length}
