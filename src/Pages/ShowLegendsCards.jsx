@@ -6,7 +6,7 @@ import Pagination from '../Components/Pagination';
 import CardSearch from '../Components/CardSearch';
 
 const apiURL = 'https://api.pokemontcg.io/v2/cards';
-const apiKey = 'YOUR_API_KEY_HERE';
+const apiKey = 'YOUR_API_KEY_HERE';     
 
 const App = () => {
   const [cards, setCards] = useState([]);

@@ -1,13 +1,13 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import Pagination from '../Components/Pagination';
-import debounce from 'lodash.debounce';
 
 const ShowGames = () => {
     const [games, setGames] = useState([]);
     const [detailedGames, setDetailedGames] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
+    const [filteredGames, setFilteredGames] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [error, setError] = useState(null);
 
@@ -23,6 +23,7 @@ const ShowGames = () => {
                         game => game.name && !excludedAppIds.includes(game.appid)
                     );
                     setGames(allGames);
+                    setFilteredGames(allGames); // Set initially to all games
                 } else {
                     setError('Invalid data structure received from API');
                 }
@@ -37,7 +38,7 @@ const ShowGames = () => {
     useEffect(() => {
         const fetchGameDetails = async () => {
             const startIndex = (currentPage - 1) * gamesPerPage;
-            const currentGames = games.slice(startIndex, startIndex + gamesPerPage);
+            const currentGames = filteredGames.slice(startIndex, startIndex + gamesPerPage);
 
             const gameDetailsPromises = currentGames.map(async game => {
                 if (!detailedGames[game.appid]) {
@@ -63,29 +64,24 @@ const ShowGames = () => {
             setDetailedGames(updatedDetailedGames);
         };
 
-        if (games.length > 0) {
+        if (filteredGames.length > 0) {
             fetchGameDetails();
         }
-    }, [currentPage, games, detailedGames]);
+    }, [currentPage, filteredGames]);
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
 
-    const handleSearch = (event) => {
+    const handleSearchInput = (event) => {
         setSearchTerm(event.target.value);
-        setCurrentPage(1);
     };
 
-    const debouncedHandleSearch = useCallback(debounce(handleSearch, 300), []);
-
-    useEffect(() => {
-        return () => {
-            debouncedHandleSearch.cancel();
-        };
-    }, [debouncedHandleSearch]);
-
-    const filteredGames = games.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    const handleSearch = () => {
+        const filtered = games.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        setFilteredGames(filtered);
+        setCurrentPage(1);
+    };
 
     const indexOfLastGame = currentPage * gamesPerPage;
     const indexOfFirstGame = indexOfLastGame - gamesPerPage;
@@ -94,13 +90,21 @@ const ShowGames = () => {
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold mb-4">Steam Games</h1>
-            <input
-                type="text"
-                placeholder="Search games..."
-                value={searchTerm}
-                onChange={debouncedHandleSearch}
-                className="mb-4 p-2 border rounded w-full"
-            />
+            <div className="flex mb-4">
+                <input
+                    type="text"
+                    placeholder="Search games..."
+                    value={searchTerm}
+                    onChange={handleSearchInput}
+                    className="p-2 border rounded w-full mr-2"
+                />
+                <button
+                    onClick={handleSearch}
+                    className="bg-blue-500 text-white p-2 rounded"
+                >
+                    Search
+                </button>
+            </div>
             {error && <p className="text-red-500">{error}</p>}
             <div className="grid grid-cols-3 gap-4">
                 {currentGames.map(game => (
@@ -119,7 +123,17 @@ const ShowGames = () => {
                     </Link>
                 ))}
             </div>
-
+            <div className="flex justify-center mt-4">
+                <Link to="/dlc" className="bg-gray-500 text-white p-2 rounded m-2">
+                    DLC
+                </Link>
+                <Link to="/demos" className="bg-gray-500 text-white p-2 rounded m-2">
+                    Demos
+                </Link>
+                <Link to="/others" className="bg-gray-500 text-white p-2 rounded m-2">
+                    Others
+                </Link>
+            </div>
             <Pagination
                 cardsPerPage={gamesPerPage}
                 totalCards={filteredGames.length}

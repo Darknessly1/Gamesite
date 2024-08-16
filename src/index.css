@@ -22,3 +22,14 @@
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
+.shrink-to-fit {
+    display: inline-block;
+    max-width: 100%; /* Adjusts the max width to 100% of its parent */
+    width: auto; /* Makes the width auto, based on content */
+    padding: 1rem; /* Add padding to give space inside the div */
+    border: 1px solid #ccc; /* Optional: Add a border */
+    border-radius: 0.5rem; /* Optional: Add rounded corners */
+    margin: 1rem; /* Add margin to separate it from other elements */
+    height: auto;
+}
