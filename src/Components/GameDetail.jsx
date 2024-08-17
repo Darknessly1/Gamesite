@@ -66,9 +66,10 @@ const GameDetail = () => {
         <div className="mx-auto p-4 bg-cover bg-fixed text-white" style={{ backgroundImage: game.background ? `url(${game.background})` : 'none', backgroundColor: game.background ? 'transparent' : 'gray' }}>
             <h1 className="text-5xl font-bold mb-8 flex items-center justify-center ">{game.name}</h1>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div className="flex flex-col justify-between">
-                    <div className="flex flex-col items-center justify-center">
+            <div className="container mx-auto p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* First Column */}
+                    <div className="flex flex-col items-center justify-center mb-4">
                         <img
                             src={game.header_image}
                             alt={game.name}
@@ -78,9 +79,6 @@ const GameDetail = () => {
                         <div className='flex items-center justify-center m-4'>
                             <p className="mb-2"><strong>Price:</strong> {game.price_overview ? game.price_overview.final_formatted : 'N/A'}</p>
                         </div>
-                    </div>
-
-                    <div className="mt-6">
                         <div className='flex items-center justify-center m-4'>
                             <ul className='border p-4 rounded-lg'>
                                 <p className="mb-2"><strong>Publisher:</strong> {game.publishers}</p>
@@ -89,8 +87,26 @@ const GameDetail = () => {
                                 <p className="mb-2"><strong>Release Date:</strong> {game.release_date.date}</p>
                             </ul>
                         </div>
+                        <div className='border rounded-lg m-4'>
+                            {game.supported_languages && (
+                                <div className="m-3">
+                                    <strong>Supported Languages:</strong>
+                                    <p
+                                        dangerouslySetInnerHTML={{
+                                            __html: game.supported_languages
+                                                .replace(/<strong>\*<\/strong>/g, '')  // Remove stars
+                                                .replace(/<br><strong>\*<\/strong>languages with full audio support/, '')  // Remove explanatory text
+                                        }}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
+                    {/* Second Column */}
+                    <div className="mb-6 border rounded-2xl p-4">
                         <div>
+                            <h1 className=' text-3xl font-bold'>The Requirements: </h1>
                             {game.pc_requirements ? (
                                 <div className='m-3'>
                                     <strong><em>PC Requirements:</em></strong>
@@ -122,30 +138,17 @@ const GameDetail = () => {
                             <p className="mb-2"><strong>Recommendations:</strong> {game.recommendations ? game.recommendations.total : "nothing"}</p>
                             <p className="mb-2"><strong>Support Info:</strong> <a href={game.support_info.url} className="inline-block">{game.support_info.url}</a></p>
                         </div>
-
-                        <div className='border rounded-lg m-4 '>
-                            {game.supported_languages && (
-                                <div className="m-3">
-                                    <strong>Supported Languages:</strong>
-                                    <p
-                                        dangerouslySetInnerHTML={{
-                                            __html: game.supported_languages
-                                                .replace(/<strong>\*<\/strong>/g, '')  // Remove stars
-                                                .replace(/<br><strong>\*<\/strong>languages with full audio support/, '')  // Remove explanatory text
-                                        }}
-                                    />
-                                </div>
-                            )}
-                        </div>
                     </div>
                 </div>
 
-                <div className="shrink-to-fit">
-                    <h1 className='text-2xl font-bold'>INFORMATION: </h1>
+                {/* Bottom Section */}
+                <div className="flex flex-col mt-8">
+                    <h1 className='text-2xl font-bold mb-4'>INFORMATION: </h1>
                     <div className="mb-2 p-2 border rounded-lg"><strong>Short Description:</strong> {game.short_description}</div>
                     <div className="mb-2 p-2 border rounded-lg"><strong>About the Game:</strong> <span dangerouslySetInnerHTML={{ __html: sanitizedAboutTheGame }} /></div>
                 </div>
             </div>
+
 
 
 
