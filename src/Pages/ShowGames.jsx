@@ -10,10 +10,11 @@ const ShowGames = () => {
     const [filteredGames, setFilteredGames] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [error, setError] = useState(null);
-
+    const [filterType, setFilterType] = useState('all'); 
     const gamesPerPage = 6;
-    const excludedAppIds = [216938, 660010, 660130];
+    const excludedAppIds = [216938, 660010, 660130, 1122575, 1122577, 1122576, 1122579, 1122578];
 
+    // Fetch all games initially
     useEffect(() => {
         const fetchGames = async () => {
             try {
@@ -23,7 +24,6 @@ const ShowGames = () => {
                         game => game.name && !excludedAppIds.includes(game.appid)
                     );
                     setGames(allGames);
-                    setFilteredGames(allGames); // Set initially to all games
                 } else {
                     setError('Invalid data structure received from API');
                 }
@@ -35,6 +35,34 @@ const ShowGames = () => {
         fetchGames();
     }, []);
 
+    // Filter games by type and search term
+    useEffect(() => {
+        const filterGames = () => {
+            let filtered = games;
+
+            // Filter by search term
+            if (searchTerm) {
+                filtered = filtered.filter(game =>
+                    game.name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+
+            // Filter by type
+            if (filterType !== 'all') {
+                filtered = filtered.filter(game => {
+                    const gameDetails = detailedGames[game.appid];
+                    if (!gameDetails) return false;
+                    return gameDetails.type === filterType;
+                });
+            }
+
+            setFilteredGames(filtered);
+        };
+
+        filterGames();
+    }, [searchTerm, filterType, games, detailedGames]);
+
+    // Fetch game details for current page
     useEffect(() => {
         const fetchGameDetails = async () => {
             const startIndex = (currentPage - 1) * gamesPerPage;
@@ -77,10 +105,9 @@ const ShowGames = () => {
         setSearchTerm(event.target.value);
     };
 
-    const handleSearch = () => {
-        const filtered = games.filter(game => game.name.toLowerCase().includes(searchTerm.toLowerCase()));
-        setFilteredGames(filtered);
-        setCurrentPage(1);
+    const handleFilterTypeChange = (type) => {
+        setFilterType(type);
+        setCurrentPage(1); 
     };
 
     const indexOfLastGame = currentPage * gamesPerPage;
@@ -99,10 +126,36 @@ const ShowGames = () => {
                     className="p-2 border rounded w-full mr-2"
                 />
                 <button
-                    onClick={handleSearch}
+                    onClick={handleFilterTypeChange.bind(null, filterType)}
                     className="bg-blue-500 text-white p-2 rounded"
                 >
                     Search
+                </button>
+            </div>
+            <div className="flex justify-center mt-4">
+                <button
+                    onClick={() => handleFilterTypeChange('all')}
+                    className={`bg-${filterType === 'all' ? 'blue' : 'gray'}-500 text-white p-2 rounded m-2`}
+                >
+                    All
+                </button>
+                <button
+                    onClick={() => handleFilterTypeChange('game')}
+                    className={`bg-${filterType === 'game' ? 'blue' : 'gray'}-500 text-white p-2 rounded m-2`}
+                >
+                    Games
+                </button>
+                <button
+                    onClick={() => handleFilterTypeChange('dlc')}
+                    className={`bg-${filterType === 'dlc' ? 'blue' : 'gray'}-500 text-white p-2 rounded m-2`}
+                >
+                    DLC
+                </button>
+                <button
+                    onClick={() => handleFilterTypeChange('demo')}
+                    className={`bg-${filterType === 'demo' ? 'blue' : 'gray'}-500 text-white p-2 rounded m-2`}
+                >
+                    Demos
                 </button>
             </div>
             {error && <p className="text-red-500">{error}</p>}
@@ -114,6 +167,7 @@ const ShowGames = () => {
                                 <>
                                     <img
                                         src={detailedGames[game.appid].header_image}
+                                        alt={game.name}
                                         className="mb-2"
                                     />
                                     <p className="text-center">{game.name}</p>
@@ -122,17 +176,6 @@ const ShowGames = () => {
                         </div>
                     </Link>
                 ))}
-            </div>
-            <div className="flex justify-center mt-4">
-                <Link to="/dlc" className="bg-gray-500 text-white p-2 rounded m-2">
-                    DLC
-                </Link>
-                <Link to="/demos" className="bg-gray-500 text-white p-2 rounded m-2">
-                    Demos
-                </Link>
-                <Link to="/others" className="bg-gray-500 text-white p-2 rounded m-2">
-                    Others
-                </Link>
             </div>
             <Pagination
                 cardsPerPage={gamesPerPage}

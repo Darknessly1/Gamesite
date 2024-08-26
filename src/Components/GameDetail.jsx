@@ -101,6 +101,10 @@ const GameDetail = () => {
                                 </div>
                             )}
                         </div>
+                        <div className='border-spacing-9 border rounded-lg p-4 m-4 max-w-max'>
+                            <p className="mb-2"><strong>Recommendations:</strong> {game.recommendations ? game.recommendations.total : "nothing"}</p>
+                            <p className="mb-2"><strong>Support Info:</strong> <a href={game.support_info.url} className="inline-block">{game.support_info.url}</a></p>
+                        </div>
                     </div>
 
                     {/* Second Column */}
@@ -134,10 +138,6 @@ const GameDetail = () => {
                             )}
                         </div>
 
-                        <div className='border-spacing-9 border rounded-lg p-4 m-4 max-w-max'>
-                            <p className="mb-2"><strong>Recommendations:</strong> {game.recommendations ? game.recommendations.total : "nothing"}</p>
-                            <p className="mb-2"><strong>Support Info:</strong> <a href={game.support_info.url} className="inline-block">{game.support_info.url}</a></p>
-                        </div>
                     </div>
                 </div>
 
