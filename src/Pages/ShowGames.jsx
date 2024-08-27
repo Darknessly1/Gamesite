@@ -10,11 +10,13 @@ const ShowGames = () => {
     const [filteredGames, setFilteredGames] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [error, setError] = useState(null);
-    const [filterType, setFilterType] = useState('all'); 
+    const [itemType, setItemType] = useState([])
     const gamesPerPage = 6;
-    const excludedAppIds = [216938, 660010, 660130, 1122575, 1122577, 1122576, 1122579, 1122578];
+    const excludedAppIds = [
+        216938, 660010, 660130, 1122575, 1122577,
+        1122576, 1122579, 1122578
+    ];
 
-    // Fetch all games initially
     useEffect(() => {
         const fetchGames = async () => {
             try {
@@ -24,6 +26,7 @@ const ShowGames = () => {
                         game => game.name && !excludedAppIds.includes(game.appid)
                     );
                     setGames(allGames);
+                    setFilteredGames(allGames); // Initially, show all games
                 } else {
                     setError('Invalid data structure received from API');
                 }
@@ -35,7 +38,26 @@ const ShowGames = () => {
         fetchGames();
     }, []);
 
-    // Filter games by type and search term
+
+
+    useEffect(() => {
+        const filterGamesByType = () => {
+            if (itemType === 'all') {
+                setItemType(games);
+            } else {
+                const filtered = games.filter(game => {
+                    const gameDetails = detailedGames[game.appid];
+                    return gameDetails && gameDetails.type === itemType;
+                });
+                setItemType(filtered);
+            }
+        };
+
+        filterGamesByType();
+    }, [itemType, games, detailedGames]);
+
+
+
     useEffect(() => {
         const filterGames = () => {
             let filtered = games;
@@ -46,23 +68,12 @@ const ShowGames = () => {
                     game.name.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
-
-            // Filter by type
-            if (filterType !== 'all') {
-                filtered = filtered.filter(game => {
-                    const gameDetails = detailedGames[game.appid];
-                    if (!gameDetails) return false;
-                    return gameDetails.type === filterType;
-                });
-            }
-
             setFilteredGames(filtered);
         };
 
         filterGames();
-    }, [searchTerm, filterType, games, detailedGames]);
+    }, [searchTerm, games]);
 
-    // Fetch game details for current page
     useEffect(() => {
         const fetchGameDetails = async () => {
             const startIndex = (currentPage - 1) * gamesPerPage;
@@ -97,6 +108,8 @@ const ShowGames = () => {
         }
     }, [currentPage, filteredGames]);
 
+
+
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
@@ -105,59 +118,61 @@ const ShowGames = () => {
         setSearchTerm(event.target.value);
     };
 
-    const handleFilterTypeChange = (type) => {
-        setFilterType(type);
-        setCurrentPage(1); 
-    };
-
     const indexOfLastGame = currentPage * gamesPerPage;
     const indexOfFirstGame = indexOfLastGame - gamesPerPage;
     const currentGames = filteredGames.slice(indexOfFirstGame, indexOfLastGame);
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">Steam Games</h1>
+            <h1 className="text-2xl font-bold mb-4 flex content-center justify-center">Steam Games</h1>
             <div className="flex mb-4">
                 <input
                     type="text"
                     placeholder="Search games..."
                     value={searchTerm}
                     onChange={handleSearchInput}
-                    className="p-2 border rounded w-full mr-2"
+                    className="p-2 border rounded w-fit mr-2 content-center justify-center"
                 />
-                <button
-                    onClick={handleFilterTypeChange.bind(null, filterType)}
-                    className="bg-blue-500 text-white p-2 rounded"
-                >
-                    Search
-                </button>
             </div>
-            <div className="flex justify-center mt-4">
+            <div className=''>
                 <button
-                    onClick={() => handleFilterTypeChange('all')}
-                    className={`bg-${filterType === 'all' ? 'blue' : 'gray'}-500 text-white p-2 rounded m-2`}
-                >
-                    All
-                </button>
-                <button
-                    onClick={() => handleFilterTypeChange('game')}
-                    className={`bg-${filterType === 'game' ? 'blue' : 'gray'}-500 text-white p-2 rounded m-2`}
+                    className={`bg-black text-white m-2 p-2 ${itemType === 'game' ? 'bg-gray-700' : ''}`}
+                    onClick={() => setItemType('game')}
                 >
                     Games
                 </button>
                 <button
-                    onClick={() => handleFilterTypeChange('dlc')}
-                    className={`bg-${filterType === 'dlc' ? 'blue' : 'gray'}-500 text-white p-2 rounded m-2`}
+                    className={`bg-black text-white m-2 p-2 ${itemType === 'dlc' ? 'bg-gray-700' : ''}`}
+                    onClick={() => setItemType('dlc')}
                 >
                     DLC
                 </button>
                 <button
-                    onClick={() => handleFilterTypeChange('demo')}
-                    className={`bg-${filterType === 'demo' ? 'blue' : 'gray'}-500 text-white p-2 rounded m-2`}
+                    className={`bg-black text-white m-2 p-2 ${itemType === 'demo' ? 'bg-gray-700' : ''}`}
+                    onClick={() => setItemType('demo')}
                 >
-                    Demos
+                    Demo
+                </button>
+                <button
+                    className={`bg-black text-white m-2 p-2 ${itemType === 'mod' ? 'bg-gray-700' : ''}`}
+                    onClick={() => setItemType('mod')}
+                >
+                    Mods
+                </button>
+                <button
+                    className={`bg-black text-white m-2 p-2 ${itemType === 'all' ? 'bg-gray-700' : ''}`}
+                    onClick={() => setItemType('soundtrack')}
+                >
+                    Soundtrack
+                </button>
+                <button
+                    className={`bg-black text-white m-2 p-2 ${itemType === 'all' ? 'bg-gray-700' : ''}`}
+                    onClick={() => setItemType('all')}
+                >
+                    All
                 </button>
             </div>
+
             {error && <p className="text-red-500">{error}</p>}
             <div className="grid grid-cols-3 gap-4">
                 {currentGames.map(game => (
@@ -167,7 +182,6 @@ const ShowGames = () => {
                                 <>
                                     <img
                                         src={detailedGames[game.appid].header_image}
-                                        alt={game.name}
                                         className="mb-2"
                                     />
                                     <p className="text-center">{game.name}</p>
