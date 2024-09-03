@@ -14,7 +14,7 @@ const HomePage = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [error, setError] = useState(null);
-    
+
     const newsPerPage = 4;
     const dealsPerPage = 2;
     const relPerPage = 2;
@@ -23,7 +23,7 @@ const HomePage = () => {
         setSearchQuery('');
         setSearchResults([]);
     };
-    
+
     useEffect(() => {
         const fetchNews = async () => {
             try {
@@ -91,25 +91,22 @@ const HomePage = () => {
     return (
         <div className="container mx-auto p-4">
 
-            <div className="relative content-center justify-center h-screen w-full m-4">
+            <div className="relative content-center justify-center h-screen m-6">
                 <img
-                    src="https://images.unsplash.com/photo-1494783367193-149034c05e8f"
+                    src='./test2.jpg'
                     alt="Background Image"
-                    className="absolute inset-0 w-full h-full object-cover filter blur-sm bg"
+                    className="absolute inset-0 w-full h-full object-cover filter rounded-3xl bg"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-50"></div>
-                <div className="absolute bg-inherit inset-0 top-16">
+                <div className="absolute inset-0 bg-black bg-opacity-30 rounded-3xl"></div>
+                <div className="absolute bg-inherit inset-0 top-10">
                     <div className="dark:bg-transparent">
                         <div className="mx-auto flex flex-col items-center py-12 sm:py-24">
                             <div className="w-11/12 sm:w-2/3 lg:flex justify-center items-center flex-col mb-5 sm:mb-10">
                                 <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-5xl xl:text-6xl text-center text-gray-800 dark:text-white font-black leading-10">
-                                    Lets not stress for{' '}
-                                    <span className="text-violet-800 dark:text-violet-500">Website</span>{' '}
-                                    designs.
+                                    RPG Realm Refuge, For All Games, And Gamers.{' '}
+                                    <span className="text-green-500 ">SEARCH</span>{' '}
+                                    For Your Favorite Game.
                                 </h1>
-                                <p className="mt-5 sm:mt-10 lg:w-10/12 text-gray-600 dark:text-gray-300 font-normal text-center text-xl">
-                                    A Community-built Tailwind component library.
-                                </p>
                             </div>
                             <div className="flex w-11/12 md:w-8/12 xl:w-6/12">
                                 <div className="flex flex-col rounded-md w-full">
@@ -117,14 +114,15 @@ const HomePage = () => {
                                         <input
                                             type="text"
                                             name="q"
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
                                             className="w-full p-3 rounded-md rounded-r-none border border-white placeholder-current bg-inherit dark:text-gray-300"
                                             placeholder="keyword"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') handleSearch(e.target.value);
+                                            }}
                                         />
                                         <button
-                                            onClick={handleSearch}
-                                            className="inline-flex items-center gap-2 bg-violet-700 text-white border-white text-lg font-semibold py-3 px-6 rounded-r-md"
+                                            onClick={() => handleSearch(document.querySelector('input[name="q"]').value)}
+                                            className="inline-flex items-center gap-2 bg-violet-700 bg-white text-black border-black hover:bg-blue-gray-800 hover:text-white text-lg font-semibold py-3 px-6 rounded-r-md"
                                         >
                                             <span>Find</span>
                                             <svg
@@ -137,7 +135,7 @@ const HomePage = () => {
                                         </button>
                                         <button
                                             onClick={clearSearch}
-                                            className="ml-2 inline-flex items-center gap-2 bg-gray-500 text-white border-white text-lg font-semibold py-3 px-6 rounded-md"
+                                            className="ml-2 inline-flex items-center gap-2 bg-white text-black border-black hover:bg-blue-gray-800 hover:text-white text-lg font-semibold py-3 px-6 rounded-md"
                                         >
                                             Clear
                                         </button>
@@ -149,14 +147,25 @@ const HomePage = () => {
                                     <h3 className="text-lg font-bold mb-2 text-center">Search Results</h3>
                                     <div className="flex flex-col gap-4">
                                         {searchResults.map((result, index) => (
-                                            <div key={index} className="bg-gray-100 p-4 shadow rounded-md">
+                                            <a
+                                                key={index}
+                                                href={`https://store.steampowered.com/app/${result.appid}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="bg-gray-100 p-4 shadow rounded-md hover:bg-gray-200 flex items-center gap-4"
+                                            >
+                                                <img
+                                                    src={result.header_image}
+                                                    alt={result.name}
+                                                    className="w-12 h-12 object-cover rounded"
+                                                />
                                                 <h4 className="text-md font-bold">{result.name}</h4>
-                                                <p>{result.appid}</p>
-                                            </div>
+                                            </a>
                                         ))}
                                     </div>
                                 </div>
                             )}
+
                         </div>
                     </div>
 
