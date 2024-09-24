@@ -2,22 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-* width */
-::-webkit-scrollbar {
+* width */::-webkit-scrollbar {
     width: 10px;
 }
- 
+
 /* Track */
 ::-webkit-scrollbar-track {
     background: #f1f1f1;
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 5px;
 }
- 
+
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
@@ -25,11 +24,111 @@
 
 .shrink-to-fit {
     display: inline-block;
-    max-width: 100%; /* Adjusts the max width to 100% of its parent */
-    width: auto; /* Makes the width auto, based on content */
-    padding: 1rem; /* Add padding to give space inside the div */
-    border: 1px solid #ccc; /* Optional: Add a border */
-    border-radius: 0.5rem; /* Optional: Add rounded corners */
-    margin: 1rem; /* Add margin to separate it from other elements */
+    max-width: 100%;
+    /* Adjusts the max width to 100% of its parent */
+    width: auto;
+    /* Makes the width auto, based on content */
+    padding: 1rem;
+    /* Add padding to give space inside the div */
+    border: 1px solid #ccc;
+    /* Optional: Add a border */
+    border-radius: 0.5rem;
+    /* Optional: Add rounded corners */
+    margin: 1rem;
+    /* Add margin to separate it from other elements */
     height: auto;
 }
+
+
+
+.card {
+    background-color: white;
+    border-radius: 1rem;
+    border: #212121 0.2rem solid;
+    transition: all 0.4s ease-in;
+    box-shadow: 0.4rem 0.4rem 0.6rem #00000040;
+}
+
+.card:hover {
+    transform: translateY(-1.5rem);
+    border: #f2295bf0 0.2em solid;
+    border-radius: 2.5rem 0 2.5rem 0;
+}
+
+@font-face {
+    font-family: 'Electro';
+    src: url('path-to-font/Electro-Regular.woff2') format('woff2'),
+         url('path-to-font/Electro-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.tit {
+    font-family: 'Electro', sans-serif;
+}
+
+
+
+.card1 {
+    border-radius: 20px;
+    background: #ffffff;
+    position: relative;
+    padding: 1.8rem;
+    border: 0.2rem solid #000000;
+    -webkit-transition: 0.5s ease-out;
+    transition: 0.5s ease-out;
+    overflow: visible;
+    box-shadow: 0.4rem 0.4rem 0.6rem #00000040;
+
+}
+
+.card1-button {
+    text-decoration: none;
+    text-align: center;
+    -webkit-transform: translate(-50%, 125%);
+    -ms-transform: translate(-50%, 125%);
+    transform: translate(-50%, 125%);
+    width: 70%;
+    border-radius: 1rem;
+    border: none;
+    background-color: #6c00f8;
+    color: #fff;
+    font-size: 1rem;
+    padding: .5rem 1rem;
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    opacity: 0;
+    -webkit-transition: 0.3s ease-out;
+    transition: 0.3s ease-out;
+    cursor: pointer;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.text-body {
+    color: rgb(0, 0, 0);
+}
+
+/*Text*/
+.text-title {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/*Hover*/
+.card1:hover {
+    border-color: #9c53fc;
+    -webkit-box-shadow: 10px 5px 18px 0 rgba(255, 255, 255, 0.877);
+    box-shadow: 10px 5px 18px 0 rgba(255, 255, 255, 0.877);
+}
+
+.card1:hover .card1-button {
+    -webkit-transform: translate(-50%, 50%);
+    -ms-transform: translate(-50%, 50%);
+    transform: translate(-50%, 50%);
+    opacity: 1;
+}
+
+
+
+

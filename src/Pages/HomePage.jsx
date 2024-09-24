@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import Pagination from '../Components/Pagination';
 
 const HomePage = () => {
     const [news, setNews] = useState([]);
@@ -11,18 +10,36 @@ const HomePage = () => {
     const [releaasePage, setReleasePage] = useState(1);
     const [totalDeals, setTotalDeals] = useState(0);
     const [totalReleases, setTotalReleases] = useState(0);
-    const [searchResults, setSearchResults] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
     const [error, setError] = useState(null);
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearchVisible, setIsSearchVisible] = useState(false);
 
     const newsPerPage = 4;
     const dealsPerPage = 2;
     const relPerPage = 2;
 
-    const clearSearch = () => {
-        setSearchQuery('');
+    function clearSearch() {
         setSearchResults([]);
-    };
+        setIsSearchVisible(false);
+        document.querySelector('input[name="q"]').value = '';
+    }
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            const searchBox = document.getElementById("search-results");
+            if (searchBox && !searchBox.contains(event.target)) {
+                setIsSearchVisible(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+
+
 
     useEffect(() => {
         const fetchNews = async () => {
@@ -82,6 +99,7 @@ const HomePage = () => {
         try {
             const response = await axios.get(`http://localhost:4000/api/search-games?query=${query}`);
             setSearchResults(response.data);
+            setIsSearchVisible(true);
         } catch (err) {
             console.error('Error searching for games:', err.message);
             setError('Error searching for games');
@@ -142,8 +160,8 @@ const HomePage = () => {
                                     </div>
                                 </div>
                             </div>
-                            {searchResults.length > 0 && (
-                                <div className="w-11/12 md:w-8/12 xl:w-6/12 mx-auto bg-white p-4 shadow-md rounded-3xl border overflow-auto h-60 mt-4">
+                            {searchResults.length > 0 && isSearchVisible && (
+                                <div id="search-results" className="w-11/12 md:w-8/12 xl:w-6/12 mx-auto bg-white p-4 shadow-md rounded-3xl border overflow-auto h-60 mt-4">
                                     <h3 className="text-lg font-bold mb-2 text-center">Search Results</h3>
                                     <div className="flex flex-col gap-4">
                                         {searchResults.map((result, index) => (
@@ -154,35 +172,39 @@ const HomePage = () => {
                                                 rel="noopener noreferrer"
                                                 className="bg-gray-100 p-4 shadow rounded-md hover:bg-gray-200 flex items-center gap-4"
                                             >
-                                                <img
-                                                    src={result.header_image}
-                                                    alt={result.name}
-                                                    className="w-12 h-12 object-cover rounded"
-                                                />
                                                 <h4 className="text-md font-bold">{result.name}</h4>
                                             </a>
                                         ))}
                                     </div>
                                 </div>
                             )}
-
                         </div>
                     </div>
-
                 </div>
             </div>
 
 
-            <h1 className="text-2xl font-bold mb-4">Latest News & Daily Deals</h1>
+
 
             {error && <p className="text-red-500">{error}</p>}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
 
-                <div className="new-releases-section w-fit border border-spacing-8 border-black border-b-secondary-400 rounded-3xl p-4">
-                    <h2 className="text-xl font-bold mb-4">New Releases</h2>
-                    <div className="grid grid-cols-1 gap-4">
+                <div className="new-releases-section w-fit rounded-3xl p-4 relative">
+                    <h2 className="flex content-center justify-center text-7xl font-bold mb-4 tit">New Releases</h2>
+                    <div className="grid grid-cols-1 gap-4 relative">
+                        <button
+                            onClick={() => handleRelPageChange(releaasePage - 1)}
+                            className={`absolute left-0 transform -translate-y-1/2 p-3 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-600 ${releaasePage === 1 && 'opacity-50 cursor-not-allowed'}`}
+                            style={{ top: '50%' }}
+                            disabled={releaasePage === 1}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+
                         {newReleases.map((release, index) => (
-                            <div key={index} className="bg-white p-4 shadow-md rounded-3xl border overflow-hidden">
+                            <div key={index} className="bg-white p-4 m-5 shadow-md rounded-3xl border overflow-hidden card">
                                 <h3 className="text-lg font-bold mb-2 truncate">{release.title}</h3>
                                 <img src={release.header_image} alt={release.title} className="mb-2 rounded" />
                                 <p className="text-sm text-gray-600 mb-2">Price: ${release.price}</p>
@@ -191,21 +213,36 @@ const HomePage = () => {
                                 </a>
                             </div>
                         ))}
-                    </div>
 
-                    <Pagination
-                        cardsPerPage={relPerPage}
-                        totalCards={totalReleases}
-                        paginate={handleRelPageChange}
-                        currentPage={releaasePage}
-                    />
+                        <button
+                            onClick={() => handleRelPageChange(releaasePage + 1)}
+                            className={`absolute right-0 transform -translate-y-1/2 p-3 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-600 ${releaasePage === Math.ceil(totalReleases / relPerPage) && 'opacity-50 cursor-not-allowed'}`}
+                            style={{ top: '50%' }}
+                            disabled={releaasePage === Math.ceil(totalReleases / relPerPage)}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
-                <div className="daily-deals-section w-fit border border-spacing-8 border-black border-b-secondary-400 rounded-3xl p-4">
-                    <h2 className="text-xl font-bold mb-4">Daily Deals</h2>
-                    <div className="grid grid-cols-1 gap-4">
+                <div className="daily-deals-section w-fit rounded-3xl p-4 relative">
+                    <h2 className="flex content-center justify-center text-7xl font-bold mb-4">Daily Deals</h2>
+                    <div className="grid grid-cols-1 gap-4 relative">
+                        <button
+                            onClick={() => handleDealsPageChange(dealsPage - 1)}
+                            className={`absolute left-0 transform -translate-y-1/2 p-3 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-600 ${dealsPage === 1 && 'opacity-50 cursor-not-allowed'}`}
+                            style={{ top: '50%' }}
+                            disabled={dealsPage === 1}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+
                         {dailyDeals.map((deal, index) => (
-                            <div key={index} className="bg-white p-4 shadow-md rounded-3xl border overflow-hidden">
+                            <div key={index} className="bg-white p-4 shadow-md rounded-3xl border overflow-hidden card m-4">
                                 <h3 className="text-lg font-bold mb-2 truncate">{deal.title}</h3>
                                 <img src={deal.header_image} alt={deal.title} className="mb-2 rounded" />
                                 <p className="text-sm text-gray-600 mb-2">Discount: {deal.discount_percent}%</p>
@@ -216,53 +253,73 @@ const HomePage = () => {
                                 </a>
                             </div>
                         ))}
+
+                        <button
+                            onClick={() => handleDealsPageChange(dealsPage + 1)}
+                            className={`absolute right-0 transform -translate-y-1/2 p-3 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-600 ${dealsPage === Math.ceil(totalDeals / dealsPerPage) && 'opacity-50 cursor-not-allowed'}`}
+                            style={{ top: '50%' }}
+                            disabled={dealsPage === Math.ceil(totalDeals / dealsPerPage)}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
                     </div>
-                    <Pagination
-                        cardsPerPage={dealsPerPage}
-                        totalCards={totalDeals}
-                        paginate={handleDealsPageChange}
-                        currentPage={dealsPage}
-                    />
                 </div>
+
             </div>
 
             {/* News Section */}
-            <div className="news-section w-fit m-5">
-                <h2 className="text-xl font-bold mb-4">Latest News</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {currentNews.map((item, index) => (
-                        <div key={index} className="bg-white p-4 shadow-md rounded-3xl border overflow-hidden">
-                            <h3 className="text-lg font-bold mb-2 truncate">{item.title}</h3>
-                            <p className="text-sm text-gray-600 mb-2">{new Date(item.date * 1000).toLocaleDateString()}</p>
-                            {item.contents.includes('{STEAM_CLAN_IMAGE}') && (
-                                <img
-                                    src={`https://steamcdn-a.akamaihd.net/steamcommunity/public/images/clans/${item.contents.match(/{STEAM_CLAN_IMAGE}\/([^ ]+)/)[1]}`}
-                                    alt="News"
-                                    className="mb-2 rounded"
+            <div className="news-section w-fit m-89">
+                <h2 className="flex justify-center text-7xl font-bold mb-4">Latest News</h2>
+                <div className="relative">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {currentNews.map((item, index) => (
+                            <div key={index} className="bg-white card1 p-4 shadow-md rounded-3xl border overflow-hidden m-4">
+                                <h3 className="text-lg font-bold mb-2 truncate text-title">{item.title}</h3>
+                                <p className="text-sm text-gray-600 mb-2">{new Date(item.date * 1000).toLocaleDateString()}</p>
+                                <div
+                                    className="mb-2 text-gray-700 text-body"
+                                    dangerouslySetInnerHTML={{
+                                        __html: item.contents.replace(
+                                            /{STEAM_CLAN_IMAGE}[^}]+} /g,
+                                            ''
+                                        ),
+                                    }}
+                                    style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}
                                 />
-                            )}
-                            <div
-                                className="mb-2 text-gray-700"
-                                dangerouslySetInnerHTML={{
-                                    __html: item.contents.replace(
-                                        /{STEAM_CLAN_IMAGE}[^}]+} /g,
-                                        ''
-                                    ),
-                                }}
-                            />
-                            <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-                                Read more
-                            </a>
-                        </div>
-                    ))}
+                                <a href={item.url} target="_blank" rel="noopener noreferrer" className="card1-button">
+                                    Read more
+                                </a>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Left Arrow */}
+                    <button
+                        onClick={() => handleNewsPageChange(currentPage - 1)}
+                        className={`absolute top-1/2 left-0 transform -translate-y-1/2 p-3 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-600 ${currentPage === 1 && 'opacity-50 cursor-not-allowed'}`}
+                        disabled={currentPage === 1}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    {/* Right Arrow */}
+                    <button
+                        onClick={() => handleNewsPageChange(currentPage + 1)}
+                        className={`absolute top-1/2 right-0 transform -translate-y-1/2 p-3 bg-gray-800 text-white rounded-full shadow-lg hover:bg-gray-600 ${currentPage === Math.ceil(news.length / newsPerPage) && 'opacity-50 cursor-not-allowed'}`}
+                        disabled={currentPage === Math.ceil(news.length / newsPerPage)}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
                 </div>
-                <Pagination
-                    cardsPerPage={newsPerPage}
-                    totalCards={news.length}
-                    paginate={handleNewsPageChange}
-                    currentPage={currentPage}
-                />
             </div>
+
+
 
 
         </div>

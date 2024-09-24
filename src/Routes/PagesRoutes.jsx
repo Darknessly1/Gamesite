@@ -6,6 +6,7 @@ import CardInfo from '../Components/CardInfo';
 import ShowLegendsCards from '../Pages/ShowLegendsCards';
 import HomePage from '../Pages/HomePage';
 import Magic from '../Pages/ShowMagicCards';
+import Wowpage from '../Pages/Wowpage';
 
 const PagesRoutes = () => {
   return useRoutes([
@@ -16,6 +17,7 @@ const PagesRoutes = () => {
     { path: '/ShowMagicCards', element: <Magic /> },
     { path: '/games', element: <ShowGames /> },
     { path: '/games/:appid', element: <GameDetail /> },
+    { path: '/wowpage', element: <Wowpage /> },
   ]);
 };
 
