@@ -7,6 +7,10 @@ import ShowLegendsCards from '../Pages/ShowLegendsCards';
 import HomePage from '../Pages/HomePage';
 import Magic from '../Pages/ShowMagicCards';
 import Wowpage from '../Pages/Wowpage';
+import ClassesPage from '../Pages/wowpages/ClassesPage';
+import ProfessionPage from '../Pages/wowpages/ProfessionPage';
+import AchievementsPage from '../Pages/wowpages/AchievementsPage';
+import PlayableRaces from '../Pages/wowpages/PlayableRacesPage';
 
 const PagesRoutes = () => {
   return useRoutes([
@@ -18,6 +22,10 @@ const PagesRoutes = () => {
     { path: '/games', element: <ShowGames /> },
     { path: '/games/:appid', element: <GameDetail /> },
     { path: '/wowpage', element: <Wowpage /> },
+    { path: '/classespage', element: <ClassesPage /> },
+    { path: '/professionpage', element: <ProfessionPage /> },
+    { path: '/achievementspage', element: <AchievementsPage /> },
+    { path: '/playableraces', element: <PlayableRaces /> },
   ]);
 };
 
