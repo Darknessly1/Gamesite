@@ -406,34 +406,47 @@ export default function AchievementsPage() {
 
     const [searchTerm, setSearchTerm] = useState('');
     const [displayedAchievements, setDisplayedAchievements] = useState([]);
-    const [loading, setLoading] = useState(false); // New loading state
+    const [loading, setLoading] = useState(false);
+    const [showResults, setShowResults] = useState(false);
 
-    // Debounced search function
-    const debouncedSearch = debounce(async (term) => {
-        if (term.trim() === '') {
+    // Function to handle search on button click
+    const handleSearch = async () => {
+        if (searchTerm.trim() === '') {
             setDisplayedAchievements([]); // Clear results if search term is empty
             return;
         }
 
-        setLoading(true); // Start loading
+        setLoading(true);
+        setShowResults(true);
 
         try {
             const response = await axios.get(`http://localhost:7000/api/achievements`, {
-                params: { search: term }
+                params: { search: searchTerm } // Send the full search term
             });
             setDisplayedAchievements(response.data);
         } catch (error) {
             console.error('Error fetching achievements:', error);
         } finally {
-            setLoading(false); // Stop loading
+            setLoading(false);
         }
-    }, 300); // 300 milliseconds delay
+    };
 
-    // Effect to handle the search
     useEffect(() => {
-        debouncedSearch(searchTerm);
-    }, [searchTerm]);
+        const handleClickOutside = (event) => {
+            // Check if the clicked element is inside the search input or results
+            if (
+                !event.target.closest('.search-container') &&
+                !event.target.closest('.result-container')
+            ) {
+                setShowResults(false); // Hide results on clicking outside
+            }
+        };
 
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
 
 
     return (
@@ -514,31 +527,50 @@ export default function AchievementsPage() {
                         </div>
 
                         {/* Search Input Section */}
-                        <div className="additional-content flex items-center space-x-4 p-4 rounded-xl">
-                            <input
-                                type="text"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Search for an achievement..."
-                            />
-                            <div>
-                                {loading && <p>Loading...</p>} {/* Show loading indicator */}
-                                {displayedAchievements.length > 0 ? (
-                                    <ul>
-                                        {displayedAchievements.map((achievement) => (
-                                            <li key={achievement.id}>{achievement.name}</li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    !loading && <p>No achievements found.</p> // Don't show this when loading
-                                )}
+                        <div className="additional-content flex flex-col items-center space-y-4 p-4 rounded-xl">
+                            {/* Search input and button */}
+                            <div className="search-container flex items-center space-x-2 w-full max-w-lg">
+                                <input
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="Search for an achievement..."
+                                    className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    onFocus={() => setShowResults(true)} // Show results on input focus
+                                />
+                                <button
+                                    onClick={handleSearch}
+                                    className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none"
+                                >
+                                    Search
+                                </button>
                             </div>
+
+                            {/* Search results */}
+                            {showResults && (
+                                <div className="w-full max-w-lg relative mt-4">
+                                    {loading ? (
+                                        <p className="text-center text-black">Loading...</p>
+                                    ) : displayedAchievements.length > 0 && (
+                                        <ul className="result-container absolute w-full max-h-52 overflow-y-auto bg-white border border-gray-300 rounded-lg mt-2 shadow-lg z-10">
+                                            {displayedAchievements.map((achievement) => (
+                                                <li key={achievement.id} className="p-2 hover:bg-gray-100 text-black">
+                                                    {achievement.name}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                    {!loading && displayedAchievements.length === 0 && (
+                                        <p className="text-center mt-2">No achievements found.</p>
+                                    )}
+                                </div>
+                            )}
                         </div>
+
+
+
+
                     </div>
-
-                    {/* Guard against non-array data */}
-
-
                 </div>
             </div>
 
@@ -654,7 +686,7 @@ export default function AchievementsPage() {
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 }
 
