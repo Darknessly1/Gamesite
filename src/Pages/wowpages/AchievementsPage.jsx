@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import WowNav from "../../Headers/WowNav";
+import PaginationWow from "../../Components/PaginationWow";
+import debounce from 'lodash.debounce';
 
 export default function AchievementsPage() {
     const [achievements, setAchievements] = useState([]);
@@ -16,9 +18,12 @@ export default function AchievementsPage() {
     const [filteredAchievements, setFilteredAchievements] = useState([]);
     const [selectedCategoryId, setSelectedCategoryId] = useState(null);
     const [currentCategoryPage, setCurrentCategoryPage] = useState(1);
-    const itemsPerPage = 10;
+    const [achievementMedia2, setAchievementMedia2] = useState({});
+    const [showAllAchievements, setShowAllAchievements] = useState(true);
+    const [currentCategory, setCurrentCategory] = useState(null);
+    const itemsPerPage = 20;
     const dropdownRef = useRef(null);
-    const itemPerPage = 10;
+    const itemPerPage = 20;
 
     const fetchToken = async () => {
         try {
@@ -151,6 +156,44 @@ export default function AchievementsPage() {
         }
     };
 
+    const fetchMediaForSelectedAchievements = async (token, achievements, setAchievementMedia) => {
+        try {
+            const mediaPromises = achievements.map(async (achievement) => {
+                const mediaResponse = await axios.get(
+                    `https://us.api.blizzard.com/data/wow/media/achievement/${achievement.id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                        params: {
+                            namespace: 'static-us',
+                            locale: 'en_US',
+                        },
+                    }
+                );
+                return {
+                    id: achievement.id,
+                    url: mediaResponse.data.assets[0]?.value || '/placeholder-image.png'
+                };
+            });
+
+            const mediaData = await Promise.all(mediaPromises);
+
+            // Update the media map with new data
+            setAchievementMedia((prevMedia) => {
+                const updatedMediaMap = { ...prevMedia }; // Preserve existing media
+                mediaData.forEach((media) => {
+                    updatedMediaMap[media.id] = media.url; // Add new media for current achievements
+                });
+                return updatedMediaMap;
+            });
+        } catch (error) {
+            console.error('Error fetching media for selected achievements:', error);
+        }
+    };
+
+
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -172,14 +215,16 @@ export default function AchievementsPage() {
     }, [currentPage, selectedCategory]);
 
 
-    const handleCategorySelect = async (categoryId) => {
-        setSelectedCategoryId(categoryId); // Update the selected category
-        setCurrentCategoryPage(1); // Reset pagination for category-based achievements
+    const handleCategorySelect = async (categoryId, page = 1) => {
+        setSelectedCategoryId(categoryId);
+        setCurrentCategoryPage(page); // Set current page for pagination
+        setShowAllAchievements(false);
+        setCurrentCategory(categoryId);
 
         try {
             const token = await fetchToken(); // Fetch your OAuth token
 
-            // Fetch achievements for the selected category
+            // Fetch achievements for the selected category and page
             const response = await axios.get(
                 `https://us.api.blizzard.com/data/wow/achievement-category/${categoryId}`,
                 {
@@ -193,16 +238,14 @@ export default function AchievementsPage() {
                 }
             );
 
-            // Check if achievements array exists before using it
             const categoryAchievements = response.data.achievements || [];
+            if (categoryAchievements.length === 0) return;
 
-            if (categoryAchievements.length === 0) {
-                console.log('No achievements found for this category.');
-                return;
-            }
-
-            // Slice the achievements for the first page
-            const paginatedAchievements = categoryAchievements.slice(0, itemsPerPage);
+            // Paginate the achievements for the current page
+            const paginatedAchievements = categoryAchievements.slice(
+                (page - 1) * itemsPerPage,
+                page * itemsPerPage
+            );
 
             // Fetch detailed achievement information
             const detailedAchievements = await Promise.all(
@@ -223,13 +266,14 @@ export default function AchievementsPage() {
                 })
             );
 
-            setFilteredAchievements(detailedAchievements); // Store the paginated filtered achievements
+            setFilteredAchievements(detailedAchievements);
+
+            // Fetch media only for the current page's achievements
+            await fetchMediaForSelectedAchievements(token, detailedAchievements, setAchievementMedia2); // Use setAchievementMedia2 for the second table
         } catch (error) {
             console.error("Error fetching achievements by category:", error);
         }
     };
-
-
 
     const handleCategoryPageChange = async (pageNumber) => {
         setCurrentCategoryPage(pageNumber); // Update the page for category-based achievements
@@ -277,13 +321,13 @@ export default function AchievementsPage() {
             );
 
             setFilteredAchievements(detailedAchievements); // Update the filtered achievements with the paginated results
+
+            // Fetch media for the current page's achievements
+            await fetchMediaForSelectedAchievements(token, detailedAchievements, setAchievementMedia2); // Use setAchievementMedia2 for the second table
         } catch (error) {
             console.error("Error fetching paginated category achievements:", error);
         }
     };
-
-
-
 
 
     const toggleDropdown = () => {
@@ -318,26 +362,78 @@ export default function AchievementsPage() {
         };
     }, [dropdownRef]);
 
+    useEffect(() => {
+        const fetchMediaForFilteredAchievements = async () => {
+            try {
+                const mediaIds = filteredAchievements.map((achievement) => achievement.id); // Collect IDs of filtered achievements
 
-    // useEffect(() => {
-    //     // Fetching media for filtered achievements (if needed)
-    //     const fetchMediaForFilteredAchievements = async () => {
-    //         const mediaIds = filteredAchievements.map(a => a.id); // Collect IDs of filtered achievements
-    //         const mediaData = await Promise.all(mediaIds.map(id => fetchAchievementMedia(id)));
-            
-    //         // Update achievementMedia with the correct images for each achievement
-    //         setAchievementMedia((prev) => {
-    //             const newMedia = {};
-    //             mediaData.forEach((media, index) => {
-    //                 newMedia[mediaIds[index]] = media.image; // Assuming media.image is the URL
-    //             });
-    //             return { ...prev, ...newMedia };
-    //         });
-    //     };
-    
-    //     fetchMediaForFilteredAchievements();
-    // }, [filteredAchievements]); // Run when filteredAchievements change
-    
+                // Fetch media for each achievement in parallel
+                const mediaData = await Promise.all(
+                    mediaIds.map(async (id) => {
+                        const media = await fetchAchievementMedia(id);
+                        return { id, media: media.assets[0]?.value || null }; // Assuming the image URL is in assets[0].value
+                    })
+                );
+
+                // Update achievementMedia state with the fetched media data
+                setAchievementMedia((prev) => {
+                    const newMedia = {};
+                    mediaData.forEach(({ id, media }) => {
+                        newMedia[id] = media; // Store the image URL in the new media object
+                    });
+                    return { ...prev, ...newMedia }; // Merge with previous state
+                });
+            } catch (error) {
+                console.error("Error fetching media for achievements:", error);
+            }
+        };
+
+        if (filteredAchievements.length > 0) {
+            fetchMediaForFilteredAchievements();
+        }
+    }, [filteredAchievements]);
+
+
+
+
+
+    const handleBackToAllAchievements = () => {
+        setShowAllAchievements(true);
+        setCurrentCategory(null);
+        setFilteredAchievements(achievements);
+        // Optionally, you might want to fetch all achievements again here
+    };
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [displayedAchievements, setDisplayedAchievements] = useState([]);
+    const [loading, setLoading] = useState(false); // New loading state
+
+    // Debounced search function
+    const debouncedSearch = debounce(async (term) => {
+        if (term.trim() === '') {
+            setDisplayedAchievements([]); // Clear results if search term is empty
+            return;
+        }
+
+        setLoading(true); // Start loading
+
+        try {
+            const response = await axios.get(`http://localhost:7000/api/achievements`, {
+                params: { search: term }
+            });
+            setDisplayedAchievements(response.data);
+        } catch (error) {
+            console.error('Error fetching achievements:', error);
+        } finally {
+            setLoading(false); // Stop loading
+        }
+    }, 300); // 300 milliseconds delay
+
+    // Effect to handle the search
+    useEffect(() => {
+        debouncedSearch(searchTerm);
+    }, [searchTerm]);
+
 
 
     return (
@@ -347,12 +443,12 @@ export default function AchievementsPage() {
             </div>
 
             <div className="achievements-section mb-8">
-                <div className=" text-white w-full">
+                <div className="text-white w-full">
                     {/* Flex container to align title and button in one row */}
                     <div className="flex items-center mb-4 space-x-4">
                         {/* Title in one container */}
                         <div className="bg-gray-800 p-4 m-4 rounded-xl">
-                            <h2 className="text-2xl font-bold">Achievements</h2>
+                            <h2 className="text-2xl font-bold">All Achievements</h2>
                         </div>
 
                         {/* Button in a separate container */}
@@ -380,7 +476,7 @@ export default function AchievementsPage() {
                                                     {rootCategories.map((category) => (
                                                         <button
                                                             key={category.id}
-                                                            onClick={() => handleCategorySelect(category.id)} // Updated call
+                                                            onClick={() => handleCategorySelect(category.id)}
                                                             className="text-left px-4 py-2 hover:bg-gray-600"
                                                         >
                                                             {category.name}
@@ -403,7 +499,7 @@ export default function AchievementsPage() {
                                                     {guildCategories.map((category) => (
                                                         <button
                                                             key={category.id}
-                                                            onClick={() => handleCategorySelect(category.id)} // Updated call
+                                                            onClick={() => handleCategorySelect(category.id)}
                                                             className="text-left px-4 py-2 hover:bg-gray-600"
                                                         >
                                                             {category.name}
@@ -416,144 +512,150 @@ export default function AchievementsPage() {
                                 )}
                             </div>
                         </div>
+
+                        {/* Search Input Section */}
+                        <div className="additional-content flex items-center space-x-4 p-4 rounded-xl">
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Search for an achievement..."
+                            />
+                            <div>
+                                {loading && <p>Loading...</p>} {/* Show loading indicator */}
+                                {displayedAchievements.length > 0 ? (
+                                    <ul>
+                                        {displayedAchievements.map((achievement) => (
+                                            <li key={achievement.id}>{achievement.name}</li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    !loading && <p>No achievements found.</p> // Don't show this when loading
+                                )}
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="additional-content flex items-center space-x-4 bg-gray-800 p-4 rounded-xl">
-                        {/*Search section*/}
-                    </div>
+                    {/* Guard against non-array data */}
+
 
                 </div>
             </div>
 
-            <div className="overflow-x-auto">
-                {achievements.length > 0 ? (
-                    <table className="min-w-full table-auto bg-white shadow-md">
-                        <thead className="bg-gray-800 text-white rounded-3xl">
-                            <tr>
-                                <th className="px-4 py-2">Image</th>
-                                <th className="px-4 py-2">Name</th>
-                                <th className="px-4 py-2">Description</th>
-                                <th className="px-4 py-2">Points</th>
-                                <th className="px-4 py-2">Rewards</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {achievements.map((achievement) => (
-                                <tr
-                                    key={achievement.id}
-                                    className=" hover:bg-blue-gray-400 hover:text-white"
-                                >
-                                    <td className="px-4 py-2 border">
-                                        <img
-                                            src={achievementMedia[achievement.id] || '/placeholder-image.png'}
-                                            className="w-16 h-16 object-cover rounded"
-                                        />
-                                    </td>
-                                    <td className="px-4 py-2 border">
-                                        <h2 className="text-sm font-bold">{achievement.name}</h2>
-                                    </td>
-                                    <td className="px-4 py-2 border">
-                                        <p className="text-sm ">
-                                            {achievement.description || 'No description available'}
-                                        </p>
-                                    </td>
-                                    <td className="px-4 py-2 border">
-                                        <p className="text-sm ">{achievement.points}</p>
-                                    </td>
-                                    <td className="px-4 py-2 border">
-                                        <p className="text-sm ">{achievement.Reward}</p>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                ) : (
-                    <p className="text-center text-green-500">Loading...</p>
-                )}
-
-                <Pagination
-                    currentPage={currentPage}
-                    onPageChange={(page) => setCurrentPage(page)}
-                />
-            </div>
-
             <div>
-                {filteredAchievements.length > 0 ? (
+                {showAllAchievements ? (
                     <div className="overflow-x-auto">
-                        <table className="min-w-full table-auto">
-                            <thead className="bg-gray-800 text-white">
-                                <tr>
-                                    <th className="px-4 py-2">Image</th>
-                                    <th className="px-4 py-2">Name</th>
-                                    <th className="px-4 py-2">Description</th>
-                                    <th className="px-4 py-2">Points</th>
-                                    <th className="px-4 py-2">Reward</th> {/* Added missing header for Reward */}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredAchievements.map((achievement) => ( // Use filteredAchievements here
-                                    <tr key={achievement.id} className="hover:bg-blue-gray-400 hover:text-white">
-                                        <td className="px-4 py-2 border">
-                                            <img
-                                                src={achievementMedia[achievement.id] || '/placeholder-image.png'} // Fetch image based on filteredAchievements
-                                                className="w-16 h-16 object-cover rounded"
-                                                alt={achievement.name}
-                                            />
-                                        </td>
-                                        <td className="px-4 py-2 border">
-                                            <h2 className="text-sm font-bold">{achievement.name}</h2>
-                                        </td>
-                                        <td className="px-4 py-2 border">
-                                            <p className="text-sm">{achievement.description || 'No description available'}</p>
-                                        </td>
-                                        <td className="px-4 py-2 border">
-                                            <p className="text-sm">{achievement.points}</p>
-                                        </td>
-                                        <td className="px-4 py-2 border">
-                                            <p className="text-sm">{achievement.reward || 'No reward available'}</p> {/* Make sure reward is available */}
-                                        </td>
+                        {achievements.length > 0 ? (
+                            <table className="min-w-full table-auto bg-white shadow-md">
+                                <thead className="bg-gray-800 text-white rounded-3xl">
+                                    <tr>
+                                        <th className="px-4 py-2">Image</th>
+                                        <th className="px-4 py-2">Name</th>
+                                        <th className="px-4 py-2">Description</th>
+                                        <th className="px-4 py-2">Points</th>
+                                        <th className="px-4 py-2">Rewards</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {achievements.map((achievement) => (
+                                        <tr
+                                            key={achievement.id}
+                                            className="hover:bg-blue-gray-400 hover:text-white"
+                                        >
+                                            <td className="px-4 py-2 border">
+                                                <img
+                                                    src={achievementMedia[achievement.id] || '/placeholder-image.png'}
+                                                    className="w-10 h-10 object-cover rounded"
+                                                />
+                                            </td>
+                                            <td className="px-4 py-2 border">
+                                                <h2 className="text-sm font-bold">{achievement.name}</h2>
+                                            </td>
+                                            <td className="px-4 py-2 border">
+                                                <p className="text-sm ">
+                                                    {achievement.description || 'No description available'}
+                                                </p>
+                                            </td>
+                                            <td className="px-4 py-2 border">
+                                                <p className="text-sm ">{achievement.points}</p>
+                                            </td>
+                                            <td className="px-4 py-2 border">
+                                                <p className="text-sm ">{achievement.Reward}</p>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        ) : (
+                            <p className="text-center text-green-500">No achievements found.</p>
+                        )}
+
+                        <PaginationWow
+                            currentPage={currentPage}
+                            onPageChange={(page) => setCurrentPage(page)}
+                        />
                     </div>
                 ) : (
-                    <p className="text-black mt-4">Select a category to view achievements.</p>
+                    <div>
+                        <h2>{categories.name}</h2>
+                        {filteredAchievements.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full table-auto bg-white">
+                                    <thead className="bg-gray-800 text-white">
+                                        <tr>
+                                            <th className="px-4 py-2">Image</th>
+                                            <th className="px-4 py-2">Name</th>
+                                            <th className="px-4 py-2">Description</th>
+                                            <th className="px-4 py-2">Points</th>
+                                            <th className="px-4 py-2">Reward</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredAchievements.map((achievement) => (
+                                            <tr key={achievement.id} className="hover:bg-blue-gray-400 hover:text-white">
+                                                <td className="px-4 py-2 border">
+                                                    <img
+                                                        src={achievementMedia2[achievement.id] || '/placeholder-image.png'}
+                                                        className="w-10 h-10 object-cover rounded"
+                                                    />
+                                                </td>
+                                                <td className="px-4 py-2 border">
+                                                    <h2 className="text-sm font-bold">{achievement.name}</h2>
+                                                </td>
+                                                <td className="px-4 py-2 border">
+                                                    <p className="text-sm">{achievement.description || 'No description available'}</p>
+                                                </td>
+                                                <td className="px-4 py-2 border">
+                                                    <p className="text-sm">{achievement.points}</p>
+                                                </td>
+                                                <td className="px-4 py-2 border">
+                                                    <p className="text-sm">{achievement.reward || 'No reward available'}</p>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+
+                                <PaginationWow
+                                    currentPage={currentCategoryPage}
+                                    onPageChange={handleCategoryPageChange}
+                                />
+                            </div>
+                        ) : (
+                            <p className="text-black mt-4 flex justify-center content-center">Select a category to view achievements.</p>
+                        )}
+
+                        <button
+                            onClick={handleBackToAllAchievements}
+                            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+                        >
+                            Back to All Achievements
+                        </button>
+                    </div>
                 )}
-
-                <Pagination
-                    currentPage={currentCategoryPage}
-                    onPageChange={handleCategoryPageChange}
-                />
-
             </div>
-
         </div>
     );
 }
 
 
-const Pagination = ({ currentPage, onPageChange }) => {
-    return (
-        <div>
-            <button
-                onClick={() => onPageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-4 py-2 mr-2 bg-gray-600 text-white rounded disabled:opacity-50"
-            >
-                Previous
-            </button>
-            <span
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded"
-            >
-                Page: {currentPage}
-            </span>
-            <button
-                onClick={() => onPageChange(currentPage + 1)}
-                className="px-4 py-2 ml-2 bg-gray-600 text-white"
-            >
-                Next
-            </button>
-        </div >
-    );
-};
