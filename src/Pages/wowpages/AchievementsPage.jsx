@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import WowNav from "../../Headers/WowNav";
 import PaginationWow from "../../Components/PaginationWow";
-import debounce from 'lodash.debounce';
 
 export default function AchievementsPage() {
     const [achievements, setAchievements] = useState([]);
@@ -412,7 +411,8 @@ export default function AchievementsPage() {
     // Function to handle search on button click
     const handleSearch = async () => {
         if (searchTerm.trim() === '') {
-            setDisplayedAchievements([]); // Clear results if search term is empty
+            setDisplayedAchievements([]);
+            setShowResults(false);
             return;
         }
 
@@ -428,6 +428,18 @@ export default function AchievementsPage() {
             console.error('Error fetching achievements:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+
+        if (value.trim() === '') {
+            setDisplayedAchievements([]); // Clear results if input is empty
+            setShowResults(false); // Hide results if input is empty
+        } else {
+            setShowResults(true); // Show results if input is not empty
         }
     };
 
@@ -448,6 +460,29 @@ export default function AchievementsPage() {
         };
     }, []);
 
+    const [selectedCategoryName, setSelectedCategoryName] = useState('');
+
+    // Check and update category name when selectedCategoryId changes
+    useEffect(() => {
+        if (selectedCategoryId && categories.length > 0) {
+            const selectedCategory = categories.find(cat => cat.id === selectedCategoryId);
+
+            // Assuming you have a separate state for guild categories
+            const selectedGuildCategory = guildCategories.find(cat => cat.id === selectedCategoryId);
+
+            if (selectedCategory) {
+                setSelectedCategoryName(selectedCategory.name);
+            } else if (selectedGuildCategory) {
+                setSelectedCategoryName(selectedGuildCategory.name);
+            } else {
+                setSelectedCategoryName('Unknown Category');
+            }
+        } else {
+            setSelectedCategoryName(''); // Clear the name if no category is selected
+        }
+    }, [selectedCategoryId, categories, guildCategories]);
+
+
 
     return (
         <div className="m-4">
@@ -461,7 +496,7 @@ export default function AchievementsPage() {
                     <div className="flex items-center mb-4 space-x-4">
                         {/* Title in one container */}
                         <div className="bg-gray-800 p-4 m-4 rounded-xl">
-                            <h2 className="text-2xl font-bold">All Achievements</h2>
+                            <h2 className="text-2xl font-bold">{selectedCategoryName || "All Achievements"}</h2>
                         </div>
 
                         {/* Button in a separate container */}
@@ -533,7 +568,7 @@ export default function AchievementsPage() {
                                 <input
                                     type="text"
                                     value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    onChange={handleInputChange}
                                     placeholder="Search for an achievement..."
                                     className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     onFocus={() => setShowResults(true)} // Show results on input focus
@@ -566,10 +601,6 @@ export default function AchievementsPage() {
                                 </div>
                             )}
                         </div>
-
-
-
-
                     </div>
                 </div>
             </div>
@@ -619,7 +650,7 @@ export default function AchievementsPage() {
                                 </tbody>
                             </table>
                         ) : (
-                            <p className="text-center text-green-500">No achievements found.</p>
+                            <p className="text-center text-green-500">Loading...</p>
                         )}
 
                         <PaginationWow
@@ -629,7 +660,6 @@ export default function AchievementsPage() {
                     </div>
                 ) : (
                     <div>
-                        <h2>{categories.name}</h2>
                         {filteredAchievements.length > 0 ? (
                             <div className="overflow-x-auto">
                                 <table className="min-w-full table-auto bg-white">
@@ -674,7 +704,7 @@ export default function AchievementsPage() {
                                 />
                             </div>
                         ) : (
-                            <p className="text-black mt-4 flex justify-center content-center">Select a category to view achievements.</p>
+                            <p className="text-green-700 mt-4 flex justify-center content-center">Loading...</p>
                         )}
 
                         <button

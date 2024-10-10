@@ -118,7 +118,7 @@ export default function PlayableRaces() {
 
             <div className="playable-races-section mb-8">
                 <div
-                    className="bg-gray-800 text-white p-4 rounded-xl cursor-pointer"
+                    className="bg-gray-800 text-white p-4 rounded-xl w-fit m-4 "
                 >
                     <h2 className="text-2xl font-bold">Playable Races</h2>
                 </div>
