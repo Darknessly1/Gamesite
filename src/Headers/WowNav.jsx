@@ -2,7 +2,7 @@ export default function WowNav() {
 
 
     return (
-        <div className="bg-gray-500 border-2 border-black p-4 w-fit rounded-3xl relative left-1/2 transform -translate-x-1/2">
+        <div className="m-3 bg-gray-500 border-2 border-black p-4 w-fit rounded-3xl relative left-1/2 transform -translate-x-1/2">
             <nav>
                 <ul className="flex space-x-4 justify-center text-white">
                     <li>

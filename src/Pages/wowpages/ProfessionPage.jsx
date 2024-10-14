@@ -137,14 +137,6 @@ export default function ProfessionPage () {
     }
   }
 
-  const handleHover = async profession => {
-    const token = await fetchToken()
-    setSelectedProfession(profession) // Set selected profession immediately
-    setSkillTiers([]) // Clear the current skill tiers
-
-    await fetchSkillTiers(token, profession.id) // Fetch the new tiers for the hovered profession
-  }
-
   const handleSkillTierClick = (professionId, tierId) => {
     if (tierId) {
       window.location.href = `/profession/${professionId}/skill-tiers/${tierId}`
@@ -174,15 +166,12 @@ export default function ProfessionPage () {
 
   return (
     <>
-      <div className='m-3'>
-        <WowNav />
-      </div>
+      <WowNav />
 
-      <div className='professions-section mb-8'>
-        <div className='bg-gray-800 text-white p-4 rounded-xl w-fit m-4'>
+      <div className=' mb-8'>
+        <div className='flex justify-center bg-gray-800 text-white p-4 rounded-xl w-fit ml-5'>
           <h2 className='text-2xl font-bold'>Professions</h2>
         </div>
-
         {professions.length > 0 ? (
           <div className='rounded-3xl m-6'>
             <table className='table-auto bg-white rounded-lg border '>

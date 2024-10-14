@@ -12,6 +12,7 @@ import ProfessionPage from '../Pages/wowpages/ProfessionPage';
 import AchievementsPage from '../Pages/wowpages/AchievementsPage';
 import PlayableRaces from '../Pages/wowpages/PlayableRacesPage';
 import SkillTierPage from '../Pages/wowpages/SkillTierPage';
+import ClassPage from '../Pages/wowpages/ClassPage';
 
 const PagesRoutes = () => {
   return useRoutes([
@@ -28,6 +29,7 @@ const PagesRoutes = () => {
     { path: '/achievementspage', element: <AchievementsPage /> },
     { path: '/playableraces', element: <PlayableRaces /> },
     { path: '/profession/:professionId/skill-tiers/:tierId', element: <SkillTierPage /> },
+    { path: '/class/:classId', element: <ClassPage /> },
   ]);
 };
 

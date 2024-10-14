@@ -171,22 +171,22 @@ export default function SkillTierPage () {
                     expandedCategory === category.name && (
                       <table
                         key={category.name}
-                        className='min-w-full table-auto border-collapse border border-gray-200 bg-blue-gray-300'
+                        className=' bg-white rounded-2xl'
                       >
                         <thead>
                           <tr className='bg-gray-500'>
-                            <th className='border px-4 py-2 text-left'>
+                            <th className='  text-left'>
                               Recipe Name
                             </th>
-                            <th className='border px-4 py-2 text-left'>
+                            <th className='text-left'>
                               Reagents
                             </th>
                           </tr>
                         </thead>
-                        <tbody >
+                        <tbody>
                           {category.recipes.map(recipe => (
                             <tr key={recipe.id}>
-                              <td className='border px-4 py-2 flex items-center'>
+                              <td className='px-6 py-4 flex items-center'>
                                 {/* Display recipe image */}
                                 {recipeDetails[category.name] &&
                                   recipeDetails[category.name][recipe.id] && (
@@ -201,7 +201,7 @@ export default function SkillTierPage () {
                                   )}
                                 {recipe.name}
                               </td>
-                              <td className='border px-4 py-2'>
+                              <td className='px-4 '>
                                 {recipeDetails[category.name] &&
                                   recipeDetails[category.name][recipe.id] && (
                                     <ul className='list-none flex flex-wrap'>
