@@ -161,20 +161,20 @@ export default function ProfessionPage () {
         </div>
 
         {professions.length > 0 ? (
-          <div className='overflow-x-auto m-4'>
-            <table className='min-w-full table-auto bg-white shadow-md rounded-lg border border-black'>
-              <thead className='bg-gray-800 text-white rounded-3xl'>
-                <tr className='bg-gray-200'>
-                  <th className='px-4 py-2 text-left border border-black text-gray-700'>
+          <div className='rounded-3xl m-6'>
+            <table className='table-auto bg-white rounded-lg border border-black'>
+              <thead className='bg-gray-800  rounded-3xl'>
+                <tr className='bg-gray-600 text-white '>
+                  <th className='px-4 py-2 text-left border border-black'>
                     Image
                   </th>
-                  <th className='px-4 py-2 text-left border border-black text-gray-700'>
+                  <th className='px-4 py-2 text-left border border-black'>
                     Profession
                   </th>
-                  <th className='px-4 py-2 text-left border border-black text-gray-700'>
+                  <th className='px-4 py-2 text-left border border-black'>
                     Type
                   </th>
-                  <th className='px-4 py-2 text-left border border-black text-gray-700'>
+                  <th className='px-4 py-2 text-left border border-black'>
                     Description
                   </th>
                 </tr>

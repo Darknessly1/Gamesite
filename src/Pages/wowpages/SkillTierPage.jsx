@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
+import WowNav from '../../Headers/WowNav'
 
 export default function SkillTierPage () {
   const { professionId, tierId } = useParams()
@@ -133,110 +134,115 @@ export default function SkillTierPage () {
   }
 
   return (
-    <div className='p-4'>
-      <div className='mt-4'>
-        <Link to={`/professionpage`}>
-          <button className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'>
-            Back to Profession
-          </button>
-        </Link>
-      </div>
-      {tierDetails ? (
-        <div className='mt-4'>
-          <h2 className='text-xl font-semibold mt-6'>Categories:</h2>
-          <div className='flex flex-wrap gap-4'>
-            {tierDetails.categories &&
-              tierDetails.categories.map(category => (
-                <button
-                  key={category.name}
-                  className='text-lg font-semibold mb-2 cursor-pointer px-4 py-2 bg-gray-300 rounded hover:bg-gray-400'
-                  onClick={() => toggleCategory(category)}
-                >
-                  {category.name}{' '}
-                  {expandedCategory === category.name ? '-' : '+'}
-                </button>
-              ))}
-          </div>
-
-          {/* Display the expanded category's table below */}
-          {expandedCategory && (
-            <div className='mt-6'>
-              {tierDetails.categories.map(
-                category =>
-                  expandedCategory === category.name && (
-                    <table
-                      key={category.name}
-                      className='min-w-full table-auto border-collapse border border-gray-200 bg-blue-gray-300'
-                    >
-                      <thead>
-                        <tr className='bg-gray-500'>
-                          <th className='border px-4 py-2 text-left'>
-                            Recipe Name
-                          </th>
-                          <th className='border px-4 py-2 text-left'>
-                            Reagents
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {category.recipes.map(recipe => (
-                          <tr key={recipe.id}>
-                            <td className='border px-4 py-2 flex items-center'>
-                              {/* Display recipe image */}
-                              {recipeDetails[category.name] &&
-                                recipeDetails[category.name][recipe.id] && (
-                                  <img
-                                    src={
-                                      recipeDetails[category.name][recipe.id]
-                                        .recipeMediaUrl
-                                    }
-                                    alt={recipe.name}
-                                    className='w-10 h-10 mr-4 border border-gray-300 rounded'
-                                  />
-                                )}
-                              {recipe.name}
-                            </td>
-                            <td className='border px-4 py-2'>
-                              {recipeDetails[category.name] &&
-                                recipeDetails[category.name][recipe.id] && (
-                                  <ul className='list-none flex flex-wrap'>
-                                    {recipeDetails[category.name][
-                                      recipe.id
-                                    ].reagents.map((reagent, index) => (
-                                      <li
-                                        key={index}
-                                        className='flex items-center mr-4 mb-2'
-                                      >
-                                        <div className='relative inline-block group'>
-                                          <img
-                                            src={reagent.mediaUrl}
-                                            alt={reagent.name}
-                                            className='w-10 h-10 border border-gray-300 rounded'
-                                          />
-                                          <span className='absolute top-8 left-8 text-xs bg-gray-800 text-white px-1'>
-                                            {reagent.quantity}
-                                          </span>
-                                          <div className='absolute top-0 right-0 transform translate-x-full -translate-y-full bg-gray-700 text-white text-xs rounded px-2 py-2 opacity-0 group-hover:opacity-100 transition-opacity  pointer-events-none'>
-                                            {reagent.name}
-                                          </div>
-                                        </div>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )
-              )}
-            </div>
-          )}
-        </div>
-      ) : (
-        <p>Loading...</p>
-      )}
+    <>
+    <div className='m-3'>
+        <WowNav />
     </div>
+      <div className='p-4'>
+        <div className='mt-4'>
+          <Link to={`/professionpage`}>
+            <button className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'>
+              Back to Profession
+            </button>
+          </Link>
+        </div>
+        {tierDetails ? (
+          <div className='mt-4'>
+            <h2 className='text-xl font-semibold mt-6'>Categories:</h2>
+            <div className='flex flex-wrap gap-4'>
+              {tierDetails.categories &&
+                tierDetails.categories.map(category => (
+                  <button
+                    key={category.name}
+                    className='text-lg font-semibold mb-2 cursor-pointer px-4 py-2 bg-gray-300 rounded hover:bg-gray-400'
+                    onClick={() => toggleCategory(category)}
+                  >
+                    {category.name}{' '}
+                    {expandedCategory === category.name ? '-' : '+'}
+                  </button>
+                ))}
+            </div>
+
+            {/* Display the expanded category's table below */}
+            {expandedCategory && (
+              <div className='mt-6'>
+                {tierDetails.categories.map(
+                  category =>
+                    expandedCategory === category.name && (
+                      <table
+                        key={category.name}
+                        className='min-w-full table-auto border-collapse border border-gray-200 bg-blue-gray-300'
+                      >
+                        <thead>
+                          <tr className='bg-gray-500'>
+                            <th className='border px-4 py-2 text-left'>
+                              Recipe Name
+                            </th>
+                            <th className='border px-4 py-2 text-left'>
+                              Reagents
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {category.recipes.map(recipe => (
+                            <tr key={recipe.id}>
+                              <td className='border px-4 py-2 flex items-center'>
+                                {/* Display recipe image */}
+                                {recipeDetails[category.name] &&
+                                  recipeDetails[category.name][recipe.id] && (
+                                    <img
+                                      src={
+                                        recipeDetails[category.name][recipe.id]
+                                          .recipeMediaUrl
+                                      }
+                                      alt={recipe.name}
+                                      className='w-10 h-10 mr-4 border border-gray-300 rounded'
+                                    />
+                                  )}
+                                {recipe.name}
+                              </td>
+                              <td className='border px-4 py-2'>
+                                {recipeDetails[category.name] &&
+                                  recipeDetails[category.name][recipe.id] && (
+                                    <ul className='list-none flex flex-wrap'>
+                                      {recipeDetails[category.name][
+                                        recipe.id
+                                      ].reagents.map((reagent, index) => (
+                                        <li
+                                          key={index}
+                                          className='flex items-center mr-4 mb-2'
+                                        >
+                                          <div className='relative inline-block group'>
+                                            <img
+                                              src={reagent.mediaUrl}
+                                              alt={reagent.name}
+                                              className='w-10 h-10 border border-gray-300 rounded'
+                                            />
+                                            <span className='absolute top-8 left-8 text-xs bg-gray-800 text-white px-1'>
+                                              {reagent.quantity}
+                                            </span>
+                                            <div className='absolute top-0 right-0 transform translate-x-full -translate-y-full bg-gray-700 text-white text-xs rounded px-2 py-2 opacity-0 group-hover:opacity-100 transition-opacity  pointer-events-none'>
+                                              {reagent.name}
+                                            </div>
+                                          </div>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          <p>Loading...</p>
+        )}
+      </div>
+    </>
   )
 }
