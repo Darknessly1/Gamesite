@@ -183,7 +183,7 @@ export default function SkillTierPage () {
                             </th>
                           </tr>
                         </thead>
-                        <tbody>
+                        <tbody >
                           {category.recipes.map(recipe => (
                             <tr key={recipe.id}>
                               <td className='border px-4 py-2 flex items-center'>

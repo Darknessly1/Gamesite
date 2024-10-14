@@ -146,7 +146,30 @@ export default function ProfessionPage () {
   }
 
   const handleSkillTierClick = (professionId, tierId) => {
-    window.location.href = `/profession/${professionId}/skill-tiers/${tierId}`
+    if (tierId) {
+      window.location.href = `/profession/${professionId}/skill-tiers/${tierId}`
+    }
+  }
+  const [showModal, setShowModal] = useState(false) // For controlling the modal visibility
+
+  const handleProfessionClick = async profession => {
+    const token = await fetchToken()
+    setSelectedProfession(profession) // Set the selected profession
+    setSkillTiers([]) // Clear any existing skill tiers
+    setShowModal(true) // Open the modal
+
+    // Only fetch skill tiers if they exist
+    const hasSkillTiers =
+      profession.skill_tiers && profession.skill_tiers.length > 0
+
+    if (hasSkillTiers) {
+      await fetchSkillTiers(token, profession.id)
+    }
+  }
+
+  // Function to handle closing the modal
+  const closeModal = () => {
+    setShowModal(false)
   }
 
   return (
@@ -162,7 +185,7 @@ export default function ProfessionPage () {
 
         {professions.length > 0 ? (
           <div className='rounded-3xl m-6'>
-            <table className='table-auto bg-white rounded-lg border border-black'>
+            <table className='table-auto bg-white rounded-lg border '>
               <thead className='bg-gray-800  rounded-3xl'>
                 <tr className='bg-gray-600 text-white '>
                   <th className='px-4 py-2 text-left border border-black'>
@@ -179,7 +202,7 @@ export default function ProfessionPage () {
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className='rounded-2xl'>
                 {professions.map((profession, index) => (
                   <tr
                     key={profession.id}
@@ -196,49 +219,24 @@ export default function ProfessionPage () {
                         className='ml-3 w-12 h-12'
                       />
                     </td>
-                    <td
-                      className='px-4 py-2 border border-black font-bold relative'
-                      onMouseEnter={() => handleHover(profession)}
-                      onMouseLeave={() => {
-                        setSelectedProfession(null)
-                        setSkillTiers([])
-                      }}
-                    >
-                      <div className='h-full w-full'>
+
+                    {/* Update: Clickable profession name with modal */}
+                    <td className='px-4 py-2 border border-black font-bold relative'>
+                      <div className='h-full w-full cursor-pointer'>
                         <span
                           className={`${
                             profession.type?.name === 'Primary'
                               ? 'text-blue-500'
                               : 'text-green-500'
                           }`}
+                          onClick={e => {
+                            e.preventDefault() // Prevent default page navigation behavior
+                            handleProfessionClick(profession)
+                          }}
                         >
                           {profession.name}
                         </span>
                       </div>
-
-                      {selectedProfession?.id === profession.id && (
-                        <div className='absolute top-0 left-full border border-black bg-gray-200 shadow-lg rounded-lg w-60 z-10 min-h-[100px]'>
-                          {loadingTiers ? (
-                            <p className='text-center py-9'>Loading...</p>
-                          ) : skillTiers?.length > 0 ? (
-                            skillTiers.map(tier => (
-                              <div
-                                key={tier.id}
-                                className='hover:bg-gray-400 cursor-pointer border'
-                                onClick={() =>
-                                  handleSkillTierClick(profession.id, tier.id)
-                                }
-                              >
-                                {tier.name}
-                              </div>
-                            ))
-                          ) : (
-                            <p className='text-center'>
-                              No skill tiers available
-                            </p>
-                          )}
-                        </div>
-                      )}
                     </td>
 
                     <td className='px-4 py-2 border border-black'>
@@ -249,6 +247,53 @@ export default function ProfessionPage () {
                     </td>
                   </tr>
                 ))}
+
+                {/* Modal for skill tiers */}
+                {showModal && (
+                  <div
+                    className='fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50'
+                    onClick={closeModal}
+                  >
+                    <div
+                      className='bg-white p-6 rounded-lg shadow-xl w-200 relative h-200'
+                      onClick={e => e.stopPropagation()} // Prevent close on content click
+                    >
+                      <h3 className='text-xl font-bold mb-4 text-center m-4'>
+                        {selectedProfession?.name}
+                      </h3>
+
+                      {loadingTiers ? (
+                        <p className='text-center py-4 m-4'>Loading...</p>
+                      ) : skillTiers.length > 0 ? (
+                        <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 p-4'>
+                          {skillTiers.map(tier => (
+                            <div
+                              key={tier.id}
+                              className='hover:bg-gray-400 w-60 hover:text-black cursor-pointer border p-2 text-center'
+                              onClick={() =>
+                                handleSkillTierClick(
+                                  selectedProfession.id,
+                                  tier.id
+                                )
+                              }
+                            >
+                              {tier.name}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className='text-center'>No skill tiers available</p>
+                      )}
+
+                      <button
+                        className='absolute  top-2 right-2 text-white bg-red-500 w-10 hover:text-gray-700 hover:bg-white border-2 border-black'
+                        onClick={closeModal}
+                      >
+                        X
+                      </button>
+                    </div>
+                  </div>
+                )}
               </tbody>
             </table>
           </div>
