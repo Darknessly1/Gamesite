@@ -1,4 +1,5 @@
 import WowNav from '../Headers/WowNav';
+import '../index.css'
 
 const WowPage = () => {
 

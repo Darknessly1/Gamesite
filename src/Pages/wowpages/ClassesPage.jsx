@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import WowNav from '../../Headers/WowNav';
 import { Link } from "react-router-dom"; 
@@ -6,9 +6,6 @@ import { Link } from "react-router-dom";
 export default function ClassesPage () {
   const [classes, setClasses] = useState([])
   const [selectedRace, setSelectedRace] = useState('All')
-  const [availableRaces, setAvailableRaces] = useState([])
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const dropdownRef = useRef(null)
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -104,7 +101,6 @@ export default function ClassesPage () {
         )
 
         setClasses(classDetails)
-        setAvailableRaces(extractUniqueRaces(classDetails))
       } catch (error) {
         console.error('Error fetching classes:', error)
       }
@@ -120,28 +116,6 @@ export default function ClassesPage () {
     }
 
     fetchData()
-  }, [])
-
-  // Extract unique races from all classes
-  const extractUniqueRaces = classesData => {
-    const races = new Set()
-    classesData.forEach(cls => {
-      cls.playable_races?.forEach(race => races.add(race.name))
-    })
-    return ['All', ...Array.from(races)]
-  }
-
-  const handleClickOutside = event => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsDropdownOpen(false)
-    }
-  }
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
   }, [])
 
   const getRoleName = spec => {
