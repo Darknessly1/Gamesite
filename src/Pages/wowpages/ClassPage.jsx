@@ -1,20 +1,18 @@
-import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import axios from 'axios'
-import { Link } from 'react-router-dom'
-import WowNav from '../../Headers/WowNav'
-// import '../'
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+import WowNav from '../../Headers/WowNav';
 
 export default function ClassPage() {
-    const { classId } = useParams()
-    const [classDetails, setClassDetails] = useState(null)
-    const [classMedia, setClassMedia] = useState(null)
-    const [specializationDetails, setSpecializationDetails] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
-    const [specializationMedia, setSpecializationMedia] = useState({})
-    const [expandedSpecId, setExpandedSpecId] = useState(null);
-
+    const { classId } = useParams();
+    const [classDetails, setClassDetails] = useState(null);
+    const [classMedia, setClassMedia] = useState(null);
+    const [specializationDetails, setSpecializationDetails] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [specializationMedia, setSpecializationMedia] = useState({});
+    const [expandedSpecId, setExpandedSpecId] = useState(null); // State for expanded specialization
 
     useEffect(() => {
         const fetchToken = async () => {
@@ -29,13 +27,13 @@ export default function ClassPage() {
                             password: 'eouiAwYmulo3RW7yP3E5ZTC9rKR1g7Ex',
                         },
                     }
-                )
-                return response.data.access_token
+                );
+                return response.data.access_token;
             } catch (err) {
-                setError('Failed to fetch token.')
-                console.error(err)
+                setError('Failed to fetch token.');
+                console.error(err);
             }
-        }
+        };
 
         const fetchClassDetails = async (token) => {
             try {
@@ -45,8 +43,8 @@ export default function ClassPage() {
                         headers: { Authorization: `Bearer ${token}` },
                         params: { namespace: 'static-us', locale: 'en_US' },
                     }
-                )
-                setClassDetails(response.data)
+                );
+                setClassDetails(response.data);
 
                 const classMediaResponse = await axios.get(
                     `https://us.api.blizzard.com/data/wow/media/playable-class/${classId}`,
@@ -54,8 +52,8 @@ export default function ClassPage() {
                         headers: { Authorization: `Bearer ${token}` },
                         params: { namespace: 'static-us', locale: 'en_US' },
                     }
-                )
-                setClassMedia(classMediaResponse.data.assets[0].value)
+                );
+                setClassMedia(classMediaResponse.data.assets[0].value);
 
                 const specializationPromises = response.data.specializations.map(
                     async (spec) => {
@@ -65,10 +63,10 @@ export default function ClassPage() {
                                 headers: { Authorization: `Bearer ${token}` },
                                 params: { namespace: 'static-us', locale: 'en_US' },
                             }
-                        )
-                        return specResponse.data
+                        );
+                        return specResponse.data;
                     }
-                )
+                );
 
                 const mediaPromises = response.data.specializations.map(
                     async (spec) => {
@@ -78,40 +76,44 @@ export default function ClassPage() {
                                 headers: { Authorization: `Bearer ${token}` },
                                 params: { namespace: 'static-us', locale: 'en_US' },
                             }
-                        )
-                        return { [spec.id]: specResponse.data.assets[0].value }
+                        );
+                        return { [spec.id]: specResponse.data.assets[0].value };
                     }
-                )
+                );
 
-                const mediaResults = await Promise.all(mediaPromises)
+                const mediaResults = await Promise.all(mediaPromises);
                 const mediaObject = mediaResults.reduce(
                     (acc, media) => ({ ...acc, ...media }),
                     {}
-                )
-                setSpecializationMedia(mediaObject)
+                );
+                setSpecializationMedia(mediaObject);
 
-                const specializationResults = await Promise.all(specializationPromises)
-                setSpecializationDetails(specializationResults)
+                const specializationResults = await Promise.all(specializationPromises);
+                setSpecializationDetails(specializationResults);
             } catch (err) {
-                setError('Failed to fetch class details.')
-                console.error(err)
+                setError('Failed to fetch class details.');
+                console.error(err);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
-        }
+        };
 
         const fetchData = async () => {
-            const token = await fetchToken()
+            const token = await fetchToken();
             if (token) {
-                await fetchClassDetails(token)
+                await fetchClassDetails(token);
             }
-        }
+        };
 
-        fetchData()
-    }, [classId])
+        fetchData();
+    }, [classId]);
 
-    if (loading) return <div>Loading...</div>
-    if (error) return <div>{error}</div>
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>{error}</div>;
+
+    const handleToggle = (id) => {
+        setExpandedSpecId(prevId => (prevId === id ? null : id));
+    };
 
     return (
         <>
@@ -139,8 +141,7 @@ export default function ClassPage() {
 
                 <div className="my-4">
                     <h3>
-                        <span className="font-bold text-xl">Power Type:</span>{' '}
-                        {classDetails.power_type?.name}
+                        <span className="font-bold text-xl">Power Type:</span> {classDetails.power_type?.name}
                     </h3>
                 </div>
 
@@ -161,68 +162,53 @@ export default function ClassPage() {
                 <h2 className="text-2xl font-bold mb-6">Specializations</h2>
                 <div className="specialization-details grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {specializationDetails.map(spec => (
-                        <div
-                            key={spec.id}
-                            className={`card bg-white rounded-lg shadow-md p-4 ${expandedSpecId === spec.id ? 'expanded' : ''}`}
-                        >
-                            <div className='flex items-center justify-between'>
-                                <div className='flex items-center'>
-                                    {/* Specialization Image */}
+                        <div key={spec.id} className="card bg-white rounded-lg shadow-md p-4">
+                            <div className="flex items-center justify-between cursor-pointer">
+                                <div className="flex items-center">
                                     {specializationMedia[spec.id] && (
                                         <img
                                             src={specializationMedia[spec.id]}
                                             alt={`${spec.name} specialization image`}
-                                            className='w-16 h-16 rounded-full mr-4'
+                                            className="w-16 h-16 rounded-full mr-4"
                                         />
                                     )}
-                                    <h3 className='text-xl font-bold'>{spec.name}</h3>
+                                    <h3 className="text-xl font-bold">{spec.name}</h3>
                                 </div>
-                                {/* Toggle Button */}
                                 <button
                                     onClick={() => setExpandedSpecId(expandedSpecId === spec.id ? null : spec.id)}
-                                    className='px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600'
+                                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                                 >
                                     {expandedSpecId === spec.id ? 'Hide Details' : 'Show Details'}
                                 </button>
                             </div>
-
-
-                        </div>
-                    ))}
-
-                    {specializationDetails.map(spec => {
-                        <div>
                             {expandedSpecId === spec.id && (
-                                <div className='expanded-content mt-4 w-full col-span-full'>
-                                    {/* Role */}
-                                    <p className='mb-2'>
+                                <div className="expanded-content mt-4 w-full">
+                                    <p className="mb-2">
                                         <strong>Role:</strong> {spec.role?.name}
                                     </p>
-
-                                    <div className='mb-4'>
-                                        <h4 className='font-bold text-3xl text-red-500'>PvP Talents:</h4>
-                                        <ul className='list-disc list-inside'>
+                                    <div className="mb-4">
+                                        <h4 className="font-bold text-3xl text-red-500">PvP Talents:</h4>
+                                        <ul className="list-disc list-inside">
                                             {spec.pvp_talents?.map((talent, index) => (
-                                                <div key={index} className='mb-2'>
-                                                    <h5 className='font-semibold'>{talent.talent.name}</h5>
-                                                    <p className='text-sm'>
+                                                <div key={index} className="mb-2">
+                                                    <h5 className="font-semibold">{talent.talent.name}</h5>
+                                                    <p className="text-sm">
                                                         <strong>Description:</strong> {talent.spell_tooltip.description}
                                                     </p>
                                                 </div>
                                             ))}
                                         </ul>
                                     </div>
-
-                                    <p className='mb-2'>
+                                    <p className="mb-2">
                                         <strong>Primary Stat:</strong> {spec.primary_stat_type?.name}
                                     </p>
                                 </div>
                             )}
-                        </div>  
-                    })}
+                        </div>
+                    ))}
                 </div>
 
             </div>
         </>
-    )
+    );
 }
