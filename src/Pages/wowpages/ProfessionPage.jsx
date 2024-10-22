@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import WowNav from '../../Headers/WowNav'
 
-export default function ProfessionPage () {
+export default function ProfessionPage() {
   const [professions, setProfessions] = useState([])
   const [professionMedia, setProfessionMedia] = useState([])
   const [selectedProfession, setSelectedProfession] = useState(null)
@@ -173,65 +173,37 @@ export default function ProfessionPage () {
           <h2 className='text-2xl font-bold'>Professions</h2>
         </div>
         {professions.length > 0 ? (
-          <div className='rounded-3xl m-6'>
-            <table className='table-auto bg-white rounded-lg border '>
-              <thead className='bg-gray-800  rounded-3xl'>
-                <tr className='bg-gray-600 text-white '>
-                  <th className='px-4 py-2 text-left border border-black'>
-                    Image
-                  </th>
-                  <th className='px-4 py-2 text-left border border-black'>
-                    Profession
-                  </th>
-                  <th className='px-4 py-2 text-left border border-black'>
-                    Type
-                  </th>
-                  <th className='px-4 py-2 text-left border border-black'>
-                    Description
-                  </th>
+          <div className="overflow-x-auto m-3 rounded-2xl">
+            <table className="min-w-full divide-y divide-gray-200 rounded-lg shadow-lg">
+              <thead className="bg-gray-300">
+                <tr>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Image</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Profession</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Type</th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Description</th>
                 </tr>
               </thead>
-              <tbody className='rounded-2xl'>
+              <tbody className="rounded-2xl">
                 {professions.map((profession, index) => (
-                  <tr
-                    key={profession.id}
-                    className={`border-b ${
-                      index % 2 === 0 ? 'bg-white' : 'bg-gray-200'
-                    }`}
-                  >
-                    <td className='border border-black'>
+                  <tr key={profession.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700 ">
                       <img
-                        src={
-                          professionMedia[profession.id] ||
-                          '/placeholder-image.png'
-                        }
-                        className='ml-3 w-12 h-12'
+                        src={professionMedia[profession.id] || '/placeholder-image.png'}
+                        className=" w-18 h-12 rounded-full"
                       />
                     </td>
-
-                    {/* Update: Clickable profession name with modal */}
-                    <td className='px-4 py-2 border border-black font-bold relative'>
-                      <div className='h-full w-full cursor-pointer'>
-                        <span
-                          className={`${
-                            profession.type?.name === 'Primary'
-                              ? 'text-blue-500'
-                              : 'text-green-500'
-                          }`}
-                          onClick={e => {
-                            e.preventDefault() // Prevent default page navigation behavior
-                            handleProfessionClick(profession)
-                          }}
-                        >
-                          {profession.name}
-                        </span>
-                      </div>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700 font-bold border cursor-pointer">
+                      <span
+                        className={`${profession.type?.name === 'Primary' ? 'text-blue-500' : 'text-green-500'}`}
+                        onClick={() => handleProfessionClick(profession)}
+                      >
+                        {profession.name}
+                      </span>
                     </td>
-
-                    <td className='px-4 py-2 border border-black'>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border">
                       {profession.type?.name || 'Unknown'}
                     </td>
-                    <td className='px-4 py-2 border border-black'>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border">
                       {profession.description || 'No description available'}
                     </td>
                   </tr>
@@ -240,42 +212,37 @@ export default function ProfessionPage () {
                 {/* Modal for skill tiers */}
                 {showModal && (
                   <div
-                    className='fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50'
+                    className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50"
                     onClick={closeModal}
                   >
                     <div
-                      className='bg-white p-6 rounded-lg shadow-xl w-200 relative h-200'
+                      className="bg-white p-6 rounded-lg shadow-xl w-200 relative h-200"
                       onClick={e => e.stopPropagation()} // Prevent close on content click
                     >
-                      <h3 className='text-xl font-bold mb-4 text-center m-4'>
+                      <h3 className="text-xl font-bold mb-4 text-center m-4">
                         {selectedProfession?.name}
                       </h3>
 
                       {loadingTiers ? (
-                        <p className='text-center py-4 m-4'>Loading...</p>
+                        <p className="text-center py-4 m-4">Loading...</p>
                       ) : skillTiers.length > 0 ? (
-                        <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 p-4'>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4">
                           {skillTiers.map(tier => (
                             <div
                               key={tier.id}
-                              className='hover:bg-gray-400 w-60 hover:text-black cursor-pointer border p-2 text-center'
-                              onClick={() =>
-                                handleSkillTierClick(
-                                  selectedProfession.id,
-                                  tier.id
-                                )
-                              }
+                              className="hover:bg-gray-400 w-60 hover:text-black cursor-pointer border p-2 text-center"
+                              onClick={() => handleSkillTierClick(selectedProfession.id, tier.id)}
                             >
                               {tier.name}
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <p className='text-center'>No skill tiers available</p>
+                        <p className="text-center">No skill tiers available</p>
                       )}
 
                       <button
-                        className='absolute  top-2 right-2 text-white bg-red-500 w-10 hover:text-gray-700 hover:bg-white border-2 border-black'
+                        className="absolute top-2 right-2 text-white bg-red-500 w-10 hover:text-gray-700 hover:bg-white border-2 border-black"
                         onClick={closeModal}
                       >
                         X
@@ -287,8 +254,9 @@ export default function ProfessionPage () {
             </table>
           </div>
         ) : (
-          <p className='text-center text-green-500'>Loading...</p>
+          <p className="text-center text-green-500">Loading...</p>
         )}
+
       </div>
     </>
   )

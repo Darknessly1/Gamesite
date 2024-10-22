@@ -607,24 +607,21 @@ export default function AchievementsPage() {
 
             <div>
                 {showAllAchievements ? (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto m-3 rounded-2xl">
                         {achievements.length > 0 ? (
-                            <table className="min-w-full table-auto bg-white shadow-md">
-                                <thead className="bg-gray-800 text-white rounded-3xl">
+                            <table className="min-w-full divide-y divide-gray-200 rounded-lg shadow-lg">
+                                <thead className="bg-gray-300">
                                     <tr>
-                                        <th className="px-4 py-2">Image</th>
-                                        <th className="px-4 py-2">Name</th>
-                                        <th className="px-4 py-2">Description</th>
-                                        <th className="px-4 py-2">Points</th>
-                                        <th className="px-4 py-2">Rewards</th>
+                                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Image</th>
+                                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Name</th>
+                                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Description</th>
+                                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Points</th>
+                                        <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Rewards</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="bg-white divide-y divide-gray-200">
                                     {achievements.map((achievement) => (
-                                        <tr
-                                            key={achievement.id}
-                                            className="hover:bg-blue-gray-400 hover:text-white"
-                                        >
+                                        <tr key={achievement.id} className="hover:bg-blue-gray-400 hover:text-white">
                                             <td className="px-4 py-2 border">
                                                 <img
                                                     src={achievementMedia[achievement.id] || '/placeholder-image.png'}
@@ -635,15 +632,13 @@ export default function AchievementsPage() {
                                                 <h2 className="text-sm font-bold">{achievement.name}</h2>
                                             </td>
                                             <td className="px-4 py-2 border">
-                                                <p className="text-sm ">
-                                                    {achievement.description || 'No description available'}
-                                                </p>
+                                                <p className="text-sm">{achievement.description || 'No description available'}</p>
                                             </td>
                                             <td className="px-4 py-2 border">
-                                                <p className="text-sm ">{achievement.points}</p>
+                                                <p className="text-sm">{achievement.points}</p>
                                             </td>
                                             <td className="px-4 py-2 border">
-                                                <p className="text-sm ">{achievement.Reward}</p>
+                                                <p className="text-sm">{achievement.Reward}</p>
                                             </td>
                                         </tr>
                                     ))}
@@ -661,18 +656,18 @@ export default function AchievementsPage() {
                 ) : (
                     <div>
                         {filteredAchievements.length > 0 ? (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full table-auto bg-white">
-                                    <thead className="bg-gray-800 text-white">
+                            <div className="overflow-x-auto m-3 rounded-2xl">
+                                <table className="min-w-full divide-y divide-gray-200 rounded-lg shadow-lg">
+                                    <thead className="bg-gray-300">
                                         <tr>
-                                            <th className="px-4 py-2">Image</th>
-                                            <th className="px-4 py-2">Name</th>
-                                            <th className="px-4 py-2">Description</th>
-                                            <th className="px-4 py-2">Points</th>
-                                            <th className="px-4 py-2">Reward</th>
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Image</th>
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Name</th>
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Description</th>
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Points</th>
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Reward</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody className="bg-white divide-y divide-gray-200">
                                         {filteredAchievements.map((achievement) => (
                                             <tr key={achievement.id} className="hover:bg-blue-gray-400 hover:text-white">
                                                 <td className="px-4 py-2 border">
@@ -716,6 +711,7 @@ export default function AchievementsPage() {
                     </div>
                 )}
             </div>
+
         </div >
     );
 }

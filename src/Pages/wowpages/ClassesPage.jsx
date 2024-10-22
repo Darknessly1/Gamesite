@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import WowNav from '../../Headers/WowNav';
-import { Link } from "react-router-dom"; 
+import { Link } from "react-router-dom";
 
-export default function ClassesPage () {
+export default function ClassesPage() {
   const [classes, setClasses] = useState([])
   const [selectedRace, setSelectedRace] = useState('All')
 
@@ -197,54 +197,54 @@ export default function ClassesPage () {
         </div>
 
         {/* Table of Playable Classes */}
-        <table className='w-fit bg-white rounded-lg'>
-          <thead>
-            <tr className='bg-gray-800 text-white'>
-              <th className='px-4 py-2'>Image</th>
-              <th className='px-4 py-2'>Class Name</th>
-              <th className='px-4 py-2'>Power Type</th>
-              <th className='px-4 py-2'>Specializations</th>
-              <th className='px-4 py-2'>Roles</th>
-            </tr>
-          </thead>
-          <tbody>
-            {classes
-              .filter(
-                cls =>
-                  selectedRace === 'All' ||
-                  cls.playable_races?.some(race => race.name === selectedRace)
-              )
-              .map(cls => (
-                <tr key={cls.id}>
-                  <td className='p-5 py-8 border-2 flex content-center justify-center'>
-                    <img src={cls.image} alt={cls.name} className='w-12 h-12' />
-                  </td>
-                  <td className='border-2 px-4 py-2 font-bold'>
-                    <Link to={`/class/${cls.id}`}>{cls.name}</Link>
-                  </td>
-                  <td className='border-2 px-4 py-2'>{cls.power_type?.name}</td>
-
-                  <td className='border-2 px-4 py-2'>
-                    <ul className='list-disc ml-4'>
-                      {cls.specializations?.map(spec => (
-                        <li key={spec.id}>{spec.name}</li>
-                      ))}
-                    </ul>
-                  </td>
-
-                  <td className='border-2 px-4 py-2'>
-                    <ul className='list-disc ml-4'>
-                      {getUniqueRoles(cls.specializations).map(
-                        (role, index) => (
-                          <p key={index}>{role}</p>
-                        )
-                      )}
-                    </ul>
-                  </td>
+        <div className="overflow-x-auto m-3 rounded-2xl">
+          <table className="min-w-full divide-y divide-gray-200 rounded-lg shadow-lg">
+            <thead className="bg-gray-300">
+              <tr>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Image</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Class Name</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Power Type</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Specializations</th>
+                <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">Roles</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {classes && classes.length > 0 ? (
+                classes.map((cls, index) => (
+                  <tr key={cls.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+                      <img src={cls.image} alt={cls.name} className="w-12 h-12 rounded-full" />
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+                      <Link to={`/class/${cls.id}`} className="text-blue-500 hover:underline">{cls.name}</Link>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">{cls.power_type?.name}</td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+                      <ul className="list-disc ml-4">
+                        {cls.specializations?.map(spec => (
+                          <li key={spec.id}>{spec.name}</li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+                      <ul className="list-disc ml-4">
+                        {getUniqueRoles(cls.specializations).map((role, index) => (
+                          <li key={index}>{role}</li>
+                         ))}
+                      </ul>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center text-green-500 py-4">Loading...</td>
                 </tr>
-              ))}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+
       </div>
     </div>
   )

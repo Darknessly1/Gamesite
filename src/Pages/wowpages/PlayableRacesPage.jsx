@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import WowNav from "../../Headers/WowNav";
+import { Link } from 'react-router-dom';
+
 
 export default function PlayableRaces() {
     const [playableRaces, setPlayableRaces] = useState([]);
@@ -110,7 +112,7 @@ export default function PlayableRaces() {
                 <div className="bg-gray-800 text-white p-4 rounded-xl w-fit m-4">
                     <h2 className="text-2xl font-bold">Playable Races</h2>
                 </div>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto m-3 rounded-2xl">
                     <table className="min-w-full divide-y divide-gray-200 rounded-lg shadow-lg">
                         <thead className="bg-gray-300">
                             <tr>
@@ -143,17 +145,20 @@ export default function PlayableRaces() {
                                                         className="bg-gray-700 p-4 rounded-md shadow-md flex h-fit"
                                                     >
                                                         {race.playable_classes.map((cls) => (
-                                                            <button
+                                                            <Link
                                                                 key={cls.id}
-                                                                className="bg-blue-500 text-white px-2 py-1 rounded-md m-1 hover:bg-blue-600"
+                                                                to={`/class/${cls.id}`} // Dynamically navigate to class page
                                                             >
-                                                                {cls.name}
-                                                            </button>
+                                                                <button className="bg-blue-500 text-white px-2 py-1 rounded-md m-1 hover:bg-blue-600">
+                                                                    {cls.name}
+                                                                </button>
+                                                            </Link>
                                                         ))}
                                                     </div>
                                                 </div>
                                             )}
                                         </td>
+
                                     </tr>
                                 ))
                             ) : (
