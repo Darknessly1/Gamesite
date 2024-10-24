@@ -621,7 +621,7 @@ export default function AchievementsPage() {
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
                                     {achievements.map((achievement) => (
-                                        <tr key={achievement.id} className="hover:bg-blue-gray-400 hover:text-white">
+                                        <tr key={achievement.id}>
                                             <td className="px-4 py-2 border">
                                                 <img
                                                     src={achievementMedia[achievement.id] || '/placeholder-image.png'}

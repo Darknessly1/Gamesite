@@ -6,8 +6,8 @@ import { Link } from 'react-router-dom';
 
 export default function PlayableRaces() {
     const [playableRaces, setPlayableRaces] = useState([]);
-    const [showClasses, setShowClasses] = useState(null); // Manage which race's classes to show
-    const ref = useRef(); // Create a ref for the classes div
+    const [showClasses, setShowClasses] = useState(null);
+    const ref = useRef();
 
     useEffect(() => {
         const fetchToken = async () => {
@@ -20,7 +20,7 @@ export default function PlayableRaces() {
                             'Content-Type': 'application/x-www-form-urlencoded',
                         },
                         auth: {
-                            username: '0b9ab91266f7473693771094a1dbbad4',  // Use environment variables for security
+                            username: '0b9ab91266f7473693771094a1dbbad4',
                             password: 'eouiAwYmulo3RW7yP3E5ZTC9rKR1g7Ex',
                         },
                     }
@@ -62,7 +62,7 @@ export default function PlayableRaces() {
                             }
                         );
 
-                        return detailsResponse.data; // Return detailed race data
+                        return detailsResponse.data;
                     })
                 );
 

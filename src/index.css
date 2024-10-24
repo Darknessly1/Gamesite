@@ -6,6 +6,71 @@ body{
     background-color: rgb(190, 190, 190);
 }
 
+
+
+.bgpic1 {
+    background-image: url("/test4.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.bgpic1::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    z-index: 1;
+    opacity: 0.7;
+    animation: glow 3s infinite alternate;
+}
+
+@keyframes glow {
+    0% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+
+.bgpic {
+    background-image: url("/test3.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add hover effects for a subtle futuristic animation */
+.bgpic:hover {
+    transform: scale(0.5);
+    transition: transform 0.5s;
+}
+
+/* Overlay effect for a futuristic vibe */
+.bgpic:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(120deg, rgba(0, 0, 50, 0.7), rgba(50, 0, 100, 0.7)); 
+    z-index: 1;
+    opacity: 0.7;
+}
+
+
+
 * width */::-webkit-scrollbar {
     width: 10px;
 }
