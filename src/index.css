@@ -7,6 +7,18 @@ body{
 }
 
 
+.background-image {
+    background-image: url("test4.jpg");
+    background-size: cover; /* Cover the entire div */
+    background-position: center; /* Center the image */
+    height: 500px; /* Adjust height as needed */
+    width: 100%; /* Full width */
+    /* border-radius: 20%; */
+    border-top-left-radius: 30%;
+    border-bottom-right-radius: 30%;
+}
+
+
 
 .bgpic1 {
     background-image: url("/test4.jpg");

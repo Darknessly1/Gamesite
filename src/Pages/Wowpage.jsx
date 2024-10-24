@@ -1,32 +1,56 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from "react";
 import WowNav from '../Headers/WowNav';
-import '../index.css'
+import { IoMdClose } from "react-icons/io";
+import '../index.css';
 
 const WowPage = () => {
-
     const [activeSection, setActiveSection] = useState(null);
+    const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
+    const [isAnimating, setIsAnimating] = useState(false);
+    const buttonRefs = useRef({});
 
-    const sections = ['Classes', 'Races', 'Achievements', 'Professions', 'Quests'];
+    const sections = [
+        { id: 1, name: "Classes", description: "Details about Classes" },
+        { id: 2, name: "Races", description: "Details about Races" },
+        { id: 3, name: "Achievements", description: "Details about Achievements" },
+        { id: 4, name: "Professions", description: "Details about Professions" },
+        { id: 5, name: "Quests", description: "Details about Quests" }
+    ];
 
     const handleClick = (section) => {
-        setActiveSection(section); // Set the clicked section as active
+        const buttonRect = buttonRefs.current[section.id].getBoundingClientRect();
+        setModalPosition({
+            top: buttonRect.bottom + window.scrollY + 10,
+            left: buttonRect.left + window.scrollX
+        });
+        setIsAnimating(true);
+        setActiveSection(section);
     };
 
     const handleClose = () => {
-        setActiveSection(null); // Close the popup
+        setIsAnimating(false);
+        setTimeout(() => {
+            setActiveSection(null);
+        }, 300);
     };
 
-    return (
-        <div className="wow-page p-6 ">
+    useEffect(() => {
+        if (activeSection) {
+            setTimeout(() => {
+                setIsAnimating(false);
+            }, 50);
+        }
+    }, [activeSection]);
 
+    return (
+        <div className="wow-page p-6">
             <h1 className="text-3xl font-bold mb-6 text-center">World of Warcraft Information</h1>
 
             <div className='m-3'>
                 <WowNav />
             </div>
 
-            <div className="flex flex-col m-9 lg:flex-row space-y-4 lg:space-y-0 lg:space-x-6 items-start justify-center">
-
+            <div className={`flex flex-col m-9 lg:flex-row space-y-4 lg:space-y-0 lg:space-x-6 items-start justify-center `}>
                 <div className="bgpic w-full h-80 pt-20 m-10 lg:w-2/3 p-6 rounded-xl shadow-lg transform transition duration-500 hover:scale-105 relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-900 via-purple-500 to-transparent opacity-80 rounded-xl"></div>
 
@@ -55,47 +79,65 @@ const WowPage = () => {
                     </div>
                     <div className="absolute inset-0 border border-blue-400 opacity-50 rounded-xl animate-pulse"></div>
                 </div>
-
-
-
             </div>
 
-            <h1 className='flex content-center justify-center text-6xl font-bold'>Descover Sections</h1>
+            <h1 className='flex content-center justify-center text-6xl font-bold'>Discover Sections</h1>
 
-
-            <div className={`relative ${activeSection ? 'blur-sm' : ''} flex content-center justify-center flex-wrap cursor-pointer transition duration-300`}>
+            <div
+                className="text-white relative flex content-center justify-center flex-wrap transition duration-300 background-image"
+            >
                 {sections.map((section) => (
-                    <div
-                        key={section}
-                        className="relative flex content-center justify-center w-80 border-2 border-black m-2 hover:scale-105 transition duration-300 p-2"
+                    <button
+                        key={section.id}
+                        ref={(el) => (buttonRefs.current[section.id] = el)}
                         onClick={() => handleClick(section)}
+                        className="w-80 border-4 rounded-3xl border-white  m-2 hover:scale-105 transition-transform duration-300 p-2 flex items-center justify-center"
                     >
-                        <span className="text-3xl font-bold">{section}</span>
-                    </div>
+                        <span className="text-3xl font-bold">{section.name}</span>
+                    </button>
                 ))}
-
-                {/* Popup Section */}
-                {activeSection && (
-                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
-                        <div className="relative w-96 h-60 bg-white p-5 shadow-lg transform transition-all duration-500 ease-out scale-100">
-                            {/* Close Button */}
-                            <button
-                                onClick={handleClose}
-                                className="absolute top-2 right-4 text-black text-xl font-bold cursor-pointer"
-                            >
-                                &times;
-                            </button>
-
-                            {/* Popup Content */}
-                            <p className="text-center mt-10 text-lg font-semibold">
-                                Details about {activeSection} will go here.
-                            </p>
-                        </div>
-                    </div>
-                )}
             </div>
+
+
+
+            {activeSection && (
+                <div
+                    className={`fixed z-50 bg-white p-6 rounded-lg shadow-xl max-w-md w-full transition-all duration-300 ease-in-out ${isAnimating ? "opacity-0 scale-0" : "opacity-100 scale-100"
+                        }`}
+                    style={{
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        transformOrigin: "center"
+                    }}
+                >
+                    <button
+                        onClick={handleClose}
+                        className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 rounded-full p-1"
+                        aria-label="Close modal"
+                    >
+                        <IoMdClose size={24} />
+                    </button>
+                    <div className="mt-2">
+                        <h2 className="text-2xl font-bold mb-4">{activeSection.name}</h2>
+                        <p className="text-gray-700">{activeSection.description}</p>
+                    </div>
+                </div>
+            )}
+
+
+            {activeSection && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40 backdrop-blur-sm"
+                    onClick={handleClose}
+                />
+            )}
+
+
 
         </div>
+
+
     );
 };
 
