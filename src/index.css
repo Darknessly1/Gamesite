@@ -2,22 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-body{
-    background-color: rgb(190, 190, 190);
-}
 
 
 .background-image {
     background-image: url("test4.jpg");
-    background-size: cover; /* Cover the entire div */
-    background-position: center; /* Center the image */
-    height: 500px; /* Adjust height as needed */
-    width: 100%; /* Full width */
-    /* border-radius: 20%; */
-    border-top-left-radius: 30%;
-    border-bottom-right-radius: 30%;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(70%) blur(1px); 
+    transition: all 0.5s ease;
 }
 
+.background-image:hover {
+    filter: brightness(100%) blur(0); 
+}
+
+/* Default and active background images */
+.background-image {
+    background-size: cover;
+    background-position: center;
+    transition: background-image 0.6s ease-in-out;
+}
+
+.bg-default-image {
+    background-image: url("test3.jpg"); /* Default background image */
+}
+
+.bg-new-image {
+    background-image: url("test4.jpg"); /* Replace with the specified image */
+}
 
 
 .bgpic1 {
@@ -45,6 +57,7 @@ body{
     0% {
         opacity: 0.5;
     }
+
     100% {
         opacity: 1;
     }
@@ -76,7 +89,7 @@ body{
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(120deg, rgba(0, 0, 50, 0.7), rgba(50, 0, 100, 0.7)); 
+    background: linear-gradient(120deg, rgba(0, 0, 50, 0.7), rgba(50, 0, 100, 0.7));
     z-index: 1;
     opacity: 0.7;
 }
@@ -87,8 +100,9 @@ body{
     width: 10px;
 }
 
-.coltest{
-    grid-column: 1 / -1; /* This spans the div across all columns in a grid */
+.coltest {
+    grid-column: 1 / -1;
+    /* This spans the div across all columns in a grid */
 }
 
 /* Track */
@@ -143,7 +157,7 @@ body{
 @font-face {
     font-family: 'Electro';
     src: url('path-to-font/Electro-Regular.woff2') format('woff2'),
-         url('path-to-font/Electro-Regular.woff') format('woff');
+        url('path-to-font/Electro-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
@@ -213,7 +227,3 @@ body{
     transform: translate(-50%, 50%);
     opacity: 1;
 }
-
-
-
-
