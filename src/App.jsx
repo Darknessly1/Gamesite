@@ -8,7 +8,7 @@ function App() {
 
 
   return (
-    <div className="p-3 bg-gradient-to-b from-pink-200 via-cyan-100 to-pink-200 bg-double animate-colorFade">
+    <div className="p-3 bg-gradient-to-b from-green-300 via-blue-100 to-green-400 bg-double animate-colorFade">
       <Navbar />
       <PagesRoutes />
       <Footer />

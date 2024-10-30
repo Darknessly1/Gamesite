@@ -1,17 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import WowNav from '../Headers/WowNav';
-import { IoMdClose } from "react-icons/io";
 import '../index.css';
+import BlizzardNews from "./wowpages/BlizzardNews";
 
 const WowPage = () => {
     const [activeSection, setActiveSection] = useState(null);
-    const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });
+    const [modalPosition, setModalPosition] = useState({ top: 0, left: 0 });    
     const [isAnimating, setIsAnimating] = useState(false);
     const buttonRefs = useRef({});
 
     const sections = [
-        { id: 1, name: "Classes", description: "Details about Classes" },
-        { id: 2, name: "Races", description: "Details about Races" },
+        { id: 1, name: "Playable Classes", description: "Details about Classes" },
+        { id: 2, name: "Playable Races", description: "Details about Races" },
         { id: 3, name: "Achievements", description: "Details about Achievements" },
         { id: 4, name: "Professions", description: "Details about Professions" },
         { id: 5, name: "Quests", description: "Details about Quests" }
@@ -44,7 +44,7 @@ const WowPage = () => {
 
     return (
         <div className="wow-page p-6 ">
-            <h1 className="text-3xl font-bold mb-6 text-center font-mono">World of Warcraft Information</h1>
+            <h1 className="text-6xl font-bold mb-6 text-center font-mono">World of Warcraft Information</h1>
 
             <div className='m-3'>
                 <WowNav />
@@ -122,9 +122,7 @@ const WowPage = () => {
 
                 {/* Popup Content Centered Inside the Main Div */}
                 {activeSection && (
-                    <div
-                        className={`absolute inset-0 flex items-center justify-center z-20`}
-                    >
+                    <div className={`absolute inset-0 flex items-center justify-center z-20`}>
                         <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full transition-all duration-500 ease-in-out">
                             <button
                                 onClick={handleClose}
@@ -133,23 +131,21 @@ const WowPage = () => {
                             >
                                 Back
                             </button>
-                            <div className="">
-                                <h2 className="text-2xl font-bold mb-4">{activeSection.name}</h2>
+                            <div >
                                 <p className="text-gray-700">{activeSection.description}</p>
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* Background Overlay on Click */}
-                {activeSection && (
-                    <div
-                        className="fixed inset-0 z-40"
-                        onClick={handleClose}
-                    />
-                )}
             </div>
 
+
+            {/* this is for the playable classes characters.  */}
+            <div> 
+                <BlizzardNews />
+
+            </div>
 
         </div>
 
