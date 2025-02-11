@@ -39,7 +39,7 @@ We welcome contributions! Please see our [Contributing Guidelines](./CONTRIBUTIN
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/Darknessly1/Gamesite?tab=security-ov-file) file for details.
 
 ## 📧 Contact
 
